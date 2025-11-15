@@ -8,7 +8,7 @@ module.exports = {
     testEnvironment: 'jsdom',
 
     // 测试文件匹配模式
-    testMatch: ['**/tests/**/*.test.js', '**/tests/**/*.spec.js', '**/__tests__/**/*.js'],
+    testMatch: ['**/tests/**/*.test.js', '**/tests/**/*.spec.js'],
 
     // 模块路径映射
     moduleNameMapper: {
@@ -43,7 +43,7 @@ module.exports = {
     testTimeout: 10000,
 
     // 设置文件
-    setupFilesAfterEnv: ['<rootDir>/__tests__/setup.js'],
+    setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
 
     // 全局变量
     globals: {
