@@ -1,0 +1,80 @@
+# 依赖目录
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建输出
+dist/
+build/
+*.map
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE配置文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志文件
+logs/
+*.log
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 安全密钥
+*.pem
+*.key
+secrets.json
+config/secrets.js
+
+# Chrome扩展打包
+*.crx
+*.zip
+
+# 备份文件
+*.backup
+*.bak
+
+# 证书文件
+*.p12
+*.pfx
+
+# 下载文件（测试用）
+downloads/
+temp-downloads/
+
+# 用户数据
+user-data/
+profile-data/
+
+# 本地配置文件
+local-config.json
+personal-config.js
+
+# 调试文件
+debug.log
+performance.log
+
+# 打包工具输出
+webpack-stats.json
+bundle-analyzer.html

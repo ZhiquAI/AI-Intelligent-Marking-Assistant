@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "智学网AI智能阅卷助手",
+  "version": "5.0.0",
+  "description": "基于AI的智能阅卷辅助工具 - 极简风格版",
+  "minimum_chrome_version": "88",
+  "author": "AI Grading Team",
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "AI智能阅卷助手"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.zhixue.com/*",
+        "https://*.zhixue.com/*"
+      ],
+      "js": [
+        "content-enhanced.js"
+      ],
+      "run_at": "document_end",
+      "all_frames": false
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "unlimitedStorage",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://www.zhixue.com/*",
+    "https://*.zhixue.com/*",
+    "https://cdn.tailwindcss.com/*",
+    "https://cdn.jsdelivr.net/*",
+    "https://cdnjs.cloudflare.com/*",
+    "https://unpkg.com/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "libs/*",
+        "assets/*",
+        "core/*",
+        "ui/*",
+        "popup/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}
