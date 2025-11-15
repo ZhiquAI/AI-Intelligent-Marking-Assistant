@@ -1,6 +1,6 @@
 /**
  * 设置页面脚本
- * 处理API密钥配置、模型选择和验证
+ * 处理API密钥配置、模型选择、参数设置和验证
  */
 
 import { AIService } from '../services/ai-service.js';
@@ -24,6 +24,10 @@ class SettingsManager {
         return {
             // 关闭按钮
             closeBtn: document.getElementById('closeBtn'),
+
+            // 标签页按钮
+            tabButtons: document.querySelectorAll('.settings-tab-btn'),
+            tabContents: document.querySelectorAll('.tab-content'),
 
             // API密钥输入框
             openaiKey: document.getElementById('openaiKey'),
@@ -58,7 +62,43 @@ class SettingsManager {
             // 消息提示
             toast: document.getElementById('toast'),
             toastIcon: document.getElementById('toastIcon'),
-            toastMessage: document.getElementById('toastMessage')
+            toastMessage: document.getElementById('toastMessage'),
+
+            // GPT-4o参数
+            gpt4oTemp: document.getElementById('gpt4o-temp'),
+            gpt4oTempValue: document.getElementById('gpt4o-temp-value'),
+            gpt4oMaxTokens: document.getElementById('gpt4o-max-tokens'),
+            gpt4oMaxTokensValue: document.getElementById('gpt4o-max-tokens-value'),
+            gpt4oTopP: document.getElementById('gpt4o-topp'),
+            gpt4oTopPValue: document.getElementById('gpt4o-topp-value'),
+
+            // Gemini参数
+            geminiTemp: document.getElementById('gemini-temp'),
+            geminiTempValue: document.getElementById('gemini-temp-value'),
+            geminiMaxTokens: document.getElementById('gemini-max-tokens'),
+            geminiMaxTokensValue: document.getElementById('gemini-max-tokens-value'),
+            geminiTopK: document.getElementById('gemini-topk'),
+            geminiTopKValue: document.getElementById('gemini-topk-value'),
+
+            // GLM参数
+            glmTemp: document.getElementById('glm-temp'),
+            glmTempValue: document.getElementById('glm-temp-value'),
+            glmMaxTokens: document.getElementById('glm-max-tokens'),
+            glmMaxTokensValue: document.getElementById('glm-max-tokens-value'),
+            glmPenalty: document.getElementById('glm-penalty'),
+            glmPenaltyValue: document.getElementById('glm-penalty-value'),
+
+            // 预设配置按钮
+            presetConfigBtns: document.querySelectorAll('.preset-config-btn'),
+
+            // 阅卷策略
+            gradingStrategyInputs: document.querySelectorAll('input[name="grading-strategy"]'),
+            strategyItems: document.querySelectorAll('.strategy-item'),
+
+            // 高级设置
+            autoSaveToggle: document.getElementById('autoSaveToggle'),
+            debugModeToggle: document.getElementById('debugModeToggle'),
+            gradingSpeedSelect: document.getElementById('gradingSpeedSelect')
         };
     }
 
@@ -85,6 +125,164 @@ class SettingsManager {
     }
 
     /**
+     * 绑定事件监听器
+     */
+    bindEvents() {
+        // 关闭按钮
+        this.elements.closeBtn.addEventListener('click', () => {
+            window.close();
+        });
+
+        // 标签页切换
+        this.elements.tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                this.switchTab(tabName);
+            });
+        });
+
+        // 保存按钮
+        this.elements.saveSettings.addEventListener('click', () => {
+            this.saveSettings();
+        });
+
+        // 测试按钮
+        this.elements.testOpenAI.addEventListener('click', () => {
+            this.testApiKey('openai', this.elements.openaiKey.value);
+        });
+        this.elements.testGemini.addEventListener('click', () => {
+            this.testApiKey('gemini', this.elements.geminiKey.value);
+        });
+        this.elements.testQwen.addEventListener('click', () => {
+            this.testApiKey('qwen', this.elements.qwenKey.value);
+        });
+        this.elements.testGLM.addEventListener('click', () => {
+            this.testApiKey('glm', this.elements.glmKey.value);
+        });
+
+        // 模型配置变化
+        this.elements.defaultModel.addEventListener('change', () => {
+            this.updateCurrentModel();
+        });
+        this.elements.autoGradingModel.addEventListener('change', () => {
+            this.updateCurrentModel();
+        });
+
+        // GPT-4o 参数滑块
+        this.elements.gpt4oTemp.addEventListener('input', (e) => {
+            this.elements.gpt4oTempValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+        this.elements.gpt4oMaxTokens.addEventListener('input', (e) => {
+            this.elements.gpt4oMaxTokensValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+        this.elements.gpt4oTopP.addEventListener('input', (e) => {
+            this.elements.gpt4oTopPValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+
+        // Gemini 参数滑块
+        this.elements.geminiTemp.addEventListener('input', (e) => {
+            this.elements.geminiTempValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+        this.elements.geminiMaxTokens.addEventListener('input', (e) => {
+            this.elements.geminiMaxTokensValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+        this.elements.geminiTopK.addEventListener('input', (e) => {
+            this.elements.geminiTopKValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+
+        // GLM 参数滑块
+        this.elements.glmTemp.addEventListener('input', (e) => {
+            this.elements.glmTempValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+        this.elements.glmMaxTokens.addEventListener('input', (e) => {
+            this.elements.glmMaxTokensValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+        this.elements.glmPenalty.addEventListener('input', (e) => {
+            this.elements.glmPenaltyValue.textContent = e.target.value;
+            this.saveModelParams();
+        });
+
+        // 预设配置按钮
+        this.elements.presetConfigBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const preset = btn.getAttribute('data-preset');
+                this.applyPreset(preset);
+            });
+        });
+
+        // 阅卷策略选择
+        this.elements.gradingStrategyInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                this.updateStrategyStyles();
+            });
+        });
+
+        // 高级设置
+        this.elements.autoSaveToggle.addEventListener('change', () => {
+            this.saveAdvancedSettings();
+        });
+        this.elements.debugModeToggle.addEventListener('change', () => {
+            this.saveAdvancedSettings();
+        });
+        this.elements.gradingSpeedSelect.addEventListener('change', () => {
+            this.saveAdvancedSettings();
+        });
+
+        // 输入框回车事件
+        const inputs = [
+            this.elements.openaiKey,
+            this.elements.geminiKey,
+            this.elements.qwenKey,
+            this.elements.glmKey
+        ];
+        inputs.forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const provider = input.id.replace('Key', '');
+                    this.testApiKey(provider, input.value);
+                }
+            });
+        });
+    }
+
+    /**
+     * 标签页切换
+     */
+    switchTab(tabName) {
+        // 更新标签按钮样式
+        this.elements.tabButtons.forEach(btn => {
+            btn.classList.remove('active', 'bg-white', 'text-blue-600', 'shadow-sm', 'border-blue-200');
+            btn.classList.add('text-gray-700', 'hover:bg-white', 'hover:border-gray-200', 'border-transparent');
+        });
+
+        const activeTabBtn = document.querySelector(`[data-tab="${tabName}"]`);
+        if (activeTabBtn) {
+            activeTabBtn.classList.add('active', 'bg-white', 'text-blue-600', 'shadow-sm', 'border-blue-200');
+            activeTabBtn.classList.remove('text-gray-700', 'hover:bg-white', 'hover:border-gray-200', 'border-transparent');
+        }
+
+        // 更新标签内容
+        this.elements.tabContents.forEach(content => {
+            content.classList.remove('active');
+            content.classList.add('hidden');
+        });
+
+        const activeContent = document.getElementById(`tab-content-${tabName}`);
+        if (activeContent) {
+            activeContent.classList.add('active');
+            activeContent.classList.remove('hidden');
+        }
+    }
+
+    /**
      * 加载已保存的设置
      */
     async loadSavedSettings() {
@@ -102,6 +300,27 @@ class SettingsManager {
                 this.elements.enableDualValidation.checked = config.enableDualValidation;
             }
 
+            // 加载模型参数
+            if (config.modelParams) {
+                this.loadModelParams(config.modelParams);
+            }
+
+            // 加载阅卷策略
+            if (config.gradingStrategy) {
+                const strategyInput = document.querySelector(`input[value="${config.gradingStrategy}"]`);
+                if (strategyInput) {
+                    strategyInput.checked = true;
+                    this.updateStrategyStyles();
+                }
+            }
+
+            // 加载高级设置
+            if (config.advancedSettings) {
+                this.elements.autoSaveToggle.checked = config.advancedSettings.autoSave || true;
+                this.elements.debugModeToggle.checked = config.advancedSettings.debugMode || false;
+                this.elements.gradingSpeedSelect.value = config.advancedSettings.gradingSpeed || 'normal';
+            }
+
             // 检查API密钥状态
             await this.checkApiKeyStatus();
 
@@ -109,6 +328,136 @@ class SettingsManager {
         } catch (error) {
             console.error('加载已保存设置失败:', error);
         }
+    }
+
+    /**
+     * 加载模型参数
+     */
+    loadModelParams(params) {
+        // GPT-4o
+        if (params.gpt4o) {
+            this.elements.gpt4oTemp.value = params.gpt4o.temperature || 0.7;
+            this.elements.gpt4oTempValue.textContent = this.elements.gpt4oTemp.value;
+            this.elements.gpt4oMaxTokens.value = params.gpt4o.maxTokens || 2048;
+            this.elements.gpt4oMaxTokensValue.textContent = this.elements.gpt4oMaxTokens.value;
+            this.elements.gpt4oTopP.value = params.gpt4o.topP || 0.9;
+            this.elements.gpt4oTopPValue.textContent = this.elements.gpt4oTopP.value;
+        }
+
+        // Gemini
+        if (params.gemini) {
+            this.elements.geminiTemp.value = params.gemini.temperature || 0.6;
+            this.elements.geminiTempValue.textContent = this.elements.geminiTemp.value;
+            this.elements.geminiMaxTokens.value = params.gemini.maxTokens || 2048;
+            this.elements.geminiMaxTokensValue.textContent = this.elements.geminiMaxTokens.value;
+            this.elements.geminiTopK.value = params.gemini.topK || 40;
+            this.elements.geminiTopKValue.textContent = this.elements.geminiTopK.value;
+        }
+
+        // GLM
+        if (params.glm) {
+            this.elements.glmTemp.value = params.glm.temperature || 0.65;
+            this.elements.glmTempValue.textContent = this.elements.glmTemp.value;
+            this.elements.glmMaxTokens.value = params.glm.maxTokens || 2048;
+            this.elements.glmMaxTokensValue.textContent = this.elements.glmMaxTokens.value;
+            this.elements.glmPenalty.value = params.glm.penalty || 1.1;
+            this.elements.glmPenaltyValue.textContent = this.elements.glmPenalty.value;
+        }
+    }
+
+    /**
+     * 保存模型参数
+     */
+    async saveModelParams() {
+        const params = {
+            gpt4o: {
+                temperature: parseFloat(this.elements.gpt4oTemp.value),
+                maxTokens: parseInt(this.elements.gpt4oMaxTokens.value),
+                topP: parseFloat(this.elements.gpt4oTopP.value)
+            },
+            gemini: {
+                temperature: parseFloat(this.elements.geminiTemp.value),
+                maxTokens: parseInt(this.elements.geminiMaxTokens.value),
+                topK: parseInt(this.elements.geminiTopK.value)
+            },
+            glm: {
+                temperature: parseFloat(this.elements.glmTemp.value),
+                maxTokens: parseInt(this.elements.glmMaxTokens.value),
+                penalty: parseFloat(this.elements.glmPenalty.value)
+            }
+        };
+
+        const config = await this.getStoredConfig();
+        config.modelParams = params;
+        await this.saveConfig(config);
+    }
+
+    /**
+     * 应用预设配置
+     */
+    async applyPreset(preset) {
+        const presets = {
+            speed: {
+                gpt4o: { temperature: 0.3, maxTokens: 1024, topP: 0.8 },
+                gemini: { temperature: 0.2, maxTokens: 1024, topK: 20 },
+                glm: { temperature: 0.25, maxTokens: 1024, penalty: 1.05 }
+            },
+            balance: {
+                gpt4o: { temperature: 0.7, maxTokens: 2048, topP: 0.9 },
+                gemini: { temperature: 0.6, maxTokens: 2048, topK: 40 },
+                glm: { temperature: 0.65, maxTokens: 2048, penalty: 1.1 }
+            },
+            accuracy: {
+                gpt4o: { temperature: 0.2, maxTokens: 4096, topP: 0.95 },
+                gemini: { temperature: 0.1, maxTokens: 4096, topK: 60 },
+                glm: { temperature: 0.15, maxTokens: 4096, penalty: 1.15 }
+            }
+        };
+
+        const selectedPreset = presets[preset];
+        if (selectedPreset) {
+            this.loadModelParams(selectedPreset);
+            await this.saveModelParams();
+
+            const presetNames = {
+                speed: '速度优先',
+                balance: '均衡模式',
+                accuracy: '准确优先'
+            };
+
+            this.showToast('success', `已应用预设配置：${presetNames[preset]}`);
+        }
+    }
+
+    /**
+     * 更新策略样式
+     */
+    updateStrategyStyles() {
+        this.elements.strategyItems.forEach(item => {
+            const radio = item.querySelector('input[type="radio"]');
+            if (radio.checked) {
+                item.classList.remove('border-gray-200', 'hover:border-blue-300', 'bg-white');
+                item.classList.add('border-blue-500', 'bg-blue-50');
+            } else {
+                item.classList.remove('border-blue-500', 'bg-blue-50');
+                item.classList.add('border-gray-200', 'hover:border-blue-300', 'bg-white');
+            }
+        });
+    }
+
+    /**
+     * 保存高级设置
+     */
+    async saveAdvancedSettings() {
+        const advancedSettings = {
+            autoSave: this.elements.autoSaveToggle.checked,
+            debugMode: this.elements.debugModeToggle.checked,
+            gradingSpeed: this.elements.gradingSpeedSelect.value
+        };
+
+        const config = await this.getStoredConfig();
+        config.advancedSettings = advancedSettings;
+        await this.saveConfig(config);
     }
 
     /**
@@ -140,59 +489,6 @@ class SettingsManager {
             this.elements.configStatus.textContent = '请配置至少一个API密钥';
             this.elements.configStatus.className = 'text-sm font-medium text-yellow-600';
         }
-    }
-
-    /**
-     * 绑定事件监听器
-     */
-    bindEvents() {
-        // 关闭按钮
-        this.elements.closeBtn.addEventListener('click', () => {
-            window.close();
-        });
-
-        // 保存按钮
-        this.elements.saveSettings.addEventListener('click', () => {
-            this.saveSettings();
-        });
-
-        // 测试按钮
-        this.elements.testOpenAI.addEventListener('click', () => {
-            this.testApiKey('openai', this.elements.openaiKey.value);
-        });
-        this.elements.testGemini.addEventListener('click', () => {
-            this.testApiKey('gemini', this.elements.geminiKey.value);
-        });
-        this.elements.testQwen.addEventListener('click', () => {
-            this.testApiKey('qwen', this.elements.qwenKey.value);
-        });
-        this.elements.testGLM.addEventListener('click', () => {
-            this.testApiKey('glm', this.elements.glmKey.value);
-        });
-
-        // 模型配置变化
-        this.elements.defaultModel.addEventListener('change', () => {
-            this.updateCurrentModel();
-        });
-        this.elements.autoGradingModel.addEventListener('change', () => {
-            this.updateCurrentModel();
-        });
-
-        // 输入框回车事件
-        const inputs = [
-            this.elements.openaiKey,
-            this.elements.geminiKey,
-            this.elements.qwenKey,
-            this.elements.glmKey
-        ];
-        inputs.forEach(input => {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const provider = input.id.replace('Key', '');
-                    this.testApiKey(provider, input.value);
-                }
-            });
-        });
     }
 
     /**
@@ -382,11 +678,16 @@ class SettingsManager {
             }
 
             // 保存模型配置
-            const config = {
-                defaultModel: this.elements.defaultModel.value,
-                autoGradingModel: this.elements.autoGradingModel.value,
-                enableDualValidation: this.elements.enableDualValidation.checked
-            };
+            const config = await this.getStoredConfig();
+            config.defaultModel = this.elements.defaultModel.value;
+            config.autoGradingModel = this.elements.autoGradingModel.value;
+            config.enableDualValidation = this.elements.enableDualValidation.checked;
+
+            // 保存阅卷策略
+            const selectedStrategy = document.querySelector('input[name="grading-strategy"]:checked');
+            if (selectedStrategy) {
+                config.gradingStrategy = selectedStrategy.value;
+            }
 
             await this.saveConfig(config);
 
