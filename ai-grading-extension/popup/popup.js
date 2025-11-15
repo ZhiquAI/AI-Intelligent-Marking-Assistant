@@ -828,28 +828,15 @@ async function testAPIConnection(apiType, apiKey) {
 }
 
 function handleSettings() {
-    // 打开设置模态框
-    const modal = document.getElementById('settingsModal');
-    const modalContent = document.getElementById('settingsModalContent');
+    // 打开独立的设置页面（符合原型设计）
+    chrome.tabs.create({
+        url: chrome.runtime.getURL('popup/settings.html')
+    });
 
-    if (!modal || !modalContent) {
-        // console.error('设置模态框未找到');
-        return;
+    // 可选：显示提示消息
+    if (toastNotifier) {
+        toastNotifier.info('正在打开设置页面...', { duration: 1500 });
     }
-
-    // 显示模态框
-    modal.classList.remove('hidden');
-
-    // 触发动画
-    setTimeout(() => {
-        modalContent.classList.remove('scale-95', 'opacity-0');
-        modalContent.classList.add('scale-100', 'opacity-100');
-    }, 10);
-
-    // 初始化设置
-    initializeSettings();
-
-    showToast('设置面板已打开', 'info');
 }
 
 function handleExportRecords() {
