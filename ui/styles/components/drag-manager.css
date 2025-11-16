@@ -1,0 +1,556 @@
+/**
+ * 智学AI - 拖拽功能样式
+ * 拖拽手柄、拖拽状态和放置区域的视觉样式
+ */
+
+/* 导入变量 */
+@import '../shared/variables.css';
+
+/* 可拖拽元素基础样式 */
+.draggable {
+    position: relative;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform var(--transition-fast) var(--ease-in-out),
+                box-shadow var(--transition-fast) var(--ease-in-out);
+}
+
+.draggable:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.draggable.dragging {
+    cursor: grabbing;
+    opacity: 0.9;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-xl);
+    z-index: 2147483647;
+    transition: none;
+}
+
+/* 拖拽手柄样式 */
+.drag-handle {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast) var(--ease-in-out);
+}
+
+.drag-handle:hover {
+    background: var(--bg-hover);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+.drag-handle::before {
+    content: '⋮⋮';
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    letter-spacing: -2px;
+    line-height: 1;
+}
+
+.drag-handle-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+}
+
+.drag-handle-icon::before {
+    content: '≡';
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1;
+}
+
+/* 放置区域样式 */
+.drop-zone {
+    position: relative;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    transition: all var(--transition-normal) var(--ease-in-out);
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.drop-zone::before {
+    content: '在此处放置';
+    font-style: italic;
+}
+
+.drop-zone.has-items {
+    border-style: solid;
+    background: var(--bg-primary);
+    min-height: auto;
+}
+
+.drop-zone.has-items::before {
+    content: none;
+}
+
+.drop-zone-active {
+    border-color: var(--primary-500);
+    background: var(--primary-50);
+    color: var(--primary-700);
+    transform: scale(1.02);
+    box-shadow: 0 0 0 2px var(--primary-200);
+}
+
+.drop-zone-active::before {
+    content: '释放以放置';
+    font-weight: 500;
+    color: var(--primary-700);
+}
+
+/* 放置区域类型样式 */
+.drop-zone.accept-all {
+    border-color: var(--success-300);
+}
+
+.drop-zone.accept-all.drop-zone-active {
+    border-color: var(--success-500);
+    background: var(--success-50);
+    color: var(--success-700);
+    box-shadow: 0 0 0 2px var(--success-200);
+}
+
+.drop-zone.reject {
+    border-color: var(--error-300);
+    background: var(--error-50);
+    color: var(--error-700);
+}
+
+.drop-zone.reject.drop-zone-active {
+    border-color: var(--error-500);
+    background: var(--error-100);
+    box-shadow: 0 0 0 2px var(--error-200);
+}
+
+/* 拖拽预览元素 */
+.drag-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2147483648;
+    pointer-events: none;
+    opacity: 0.8;
+    transform: rotate(-2deg);
+    box-shadow: var(--shadow-xl);
+    border: 2px solid var(--primary-500);
+    background: var(--bg-primary);
+}
+
+.drag-preview::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    background: var(--primary-500);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: var(--shadow-md);
+}
+
+/* 拖拽指示器 */
+.drag-indicator {
+    position: fixed;
+    pointer-events: none;
+    z-index: 2147483647;
+    transition: all var(--transition-fast) var(--ease-in-out);
+}
+
+.drag-indicator-horizontal {
+    width: 2px;
+    height: 40px;
+    background: var(--primary-500);
+    border-radius: 1px;
+    box-shadow: 0 0 0 1px white;
+}
+
+.drag-indicator-vertical {
+    width: 40px;
+    height: 2px;
+    background: var(--primary-500);
+    border-radius: 1px;
+    box-shadow: 0 0 0 1px white;
+}
+
+.drag-indicator-corner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--primary-500);
+    border-radius: 2px;
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-md);
+}
+
+/* 网格对齐指示器 */
+.snap-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(var(--border-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 10px 10px;
+    opacity: 0;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
+}
+
+.snap-grid.visible {
+    opacity: 0.3;
+}
+
+/* 拖拽约束边界 */
+.constraint-boundary {
+    position: absolute;
+    border: 2px dashed var(--warning-500);
+    background: var(--warning-50);
+    opacity: 0.3;
+    pointer-events: none;
+    border-radius: var(--radius-md);
+}
+
+.constraint-boundary.active {
+    opacity: 0.6;
+    animation: constraintPulse 2s infinite;
+}
+
+@keyframes constraintPulse {
+    0%, 100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* 拖拽反馈 */
+.drag-feedback {
+    position: fixed;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 2147483648;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: feedbackSlideIn var(--transition-normal) var(--ease-out);
+}
+
+.drag-feedback.success {
+    background: var(--success-600);
+}
+
+.drag-feedback.error {
+    background: var(--error-600);
+}
+
+.drag-feedback.warning {
+    background: var(--warning-600);
+}
+
+.drag-feedback.info {
+    background: var(--info-600);
+}
+
+@keyframes feedbackSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 拖拽占位符 */
+.drag-placeholder {
+    border: 2px dashed var(--primary-300);
+    background: var(--primary-50);
+    border-radius: var(--radius-md);
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    animation: placeholderPulse 2s infinite;
+}
+
+@keyframes placeholderPulse {
+    0%, 100% {
+        opacity: 0.6;
+        border-color: var(--primary-300);
+    }
+    50% {
+        opacity: 1;
+        border-color: var(--primary-500);
+    }
+}
+
+/* 拖拽覆盖层 */
+.drag-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 2147483646;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
+}
+
+.drag-overlay.active {
+    opacity: 1;
+}
+
+/* 拖拽工具提示 */
+.drag-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+    padding: 0.375rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    margin-bottom: 0.5rem;
+    box-shadow: var(--shadow-md);
+    z-index: 2147483648;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
+}
+
+.drag-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--bg-inverse);
+}
+
+.drag-handle:hover .drag-tooltip {
+    opacity: 1;
+}
+
+/* 拖拽状态指示器 */
+.drag-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-lg);
+    z-index: 2147483648;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: statusSlideIn var(--transition-normal) var(--ease-out);
+}
+
+.drag-status.dragging {
+    border-color: var(--primary-500);
+    background: var(--primary-50);
+}
+
+.drag-status.invalid {
+    border-color: var(--error-500);
+    background: var(--error-50);
+    color: var(--error-700);
+}
+
+.drag-status.valid {
+    border-color: var(--success-500);
+    background: var(--success-50);
+    color: var(--success-700);
+}
+
+@keyframes statusSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 拖拽图标 */
+.drag-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.drag-icon-move {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z'/%3E%3C/svg%3E");
+}
+
+.drag-icon-copy {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z'/%3E%3C/svg%3E");
+}
+
+.drag-icon-forbidden {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8-1.41-1.42z'/%3E%3C/svg%3E");
+}
+
+/* 触摸设备优化 */
+@media (pointer: coarse) {
+    .drag-handle {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0.5rem;
+    }
+
+    .drop-zone {
+        min-height: 80px;
+        padding: 1rem;
+    }
+
+    .drag-preview {
+        transform: scale(1.1);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .drag-tooltip {
+        font-size: 0.6875rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .drag-feedback {
+        font-size: 0.8125rem;
+        padding: 0.4375rem 0.6875rem;
+    }
+
+    .drag-status {
+        top: 0.5rem;
+        right: 0.5rem;
+        font-size: 0.8125rem;
+        padding: 0.4375rem 0.875rem;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .draggable {
+        border: 1px solid var(--border-color);
+    }
+
+    .drop-zone {
+        border-width: 3px;
+    }
+
+    .drag-preview {
+        border-width: 3px;
+    }
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+    .draggable,
+    .drop-zone,
+    .drag-preview,
+    .drag-indicator,
+    .drag-feedback,
+    .drag-placeholder,
+    .drag-status {
+        animation: none;
+        transition: none;
+    }
+
+    .constraint-boundary {
+        animation: none;
+    }
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    .drag-preview {
+        background: var(--bg-primary-dark);
+        border-color: var(--primary-400);
+    }
+
+    .drag-feedback {
+        box-shadow: var(--shadow-lg-dark);
+    }
+
+    .drag-overlay {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .draggable,
+    .drag-handle,
+    .drop-zone,
+    .drag-preview,
+    .drag-indicator,
+    .drag-feedback,
+    .drag-status {
+        display: none !important;
+    }
+}
+
+/* 无障碍支持 */
+.draggable:focus,
+.drop-zone:focus {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+.draggable[aria-grabbed="true"] {
+    outline: 2px solid var(--warning-500);
+    outline-offset: 2px;
+}
+
+.drop-zone[aria-dropeffect="move"] {
+    outline: 2px solid var(--success-500);
+    outline-offset: 2px;
+}

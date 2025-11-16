@@ -1,0 +1,432 @@
+<div class="zhixue-enhanced-main-layout" role="application" aria-label="AI智能阅卷助手主界面">
+    <div class="layout-container">
+        <!-- 头部区域 -->
+        <header class="layout-header" role="banner">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo" aria-label="智学网AI助手">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 8l4 4m-4 4l4 4M16 10v12M8 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span class="logo-text">AI</span>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="app-title">智学网AI智能阅卷助手</h1>
+                        <p class="app-subtitle">基于深度学习的智能评分系统</p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="header-btn settings-btn"
+                            id="settings-btn"
+                            aria-label="设置"
+                            title="模型设置和配置">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="10" cy="10" r="3"/>
+                            <path d="M10 1v6m0 4v6m0 4v6"/>
+                        </svg>
+                        <span class="btn-text">设置</span>
+                    </button>
+
+                    <button class="header-btn help-btn"
+                            id="help-btn"
+                            aria-label="帮助"
+                            title="帮助文档">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="10" cy="10" r="8"/>
+                            <path d="M10 13v-2m0-4V7m0 4h.01M10 7h.01"/>
+                        </svg>
+                        <span class="btn-text">帮助</span>
+                    </button>
+
+                    <div class="header-divider"></div>
+
+                    <button class="header-btn minimize-btn"
+                            id="minimize-btn"
+                            aria-label="最小化"
+                            title="最小化窗口">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12h12"/>
+                        </svg>
+                    </button>
+
+                    <button class="header-btn maximize-btn"
+                            id="maximize-btn"
+                            aria-label="最大化"
+                            title="最大化窗口">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 8h12M4 16h12"/>
+                        </svg>
+                    </button>
+
+                    <button class="header-btn close-btn"
+                            id="close-btn"
+                            aria-label="关闭"
+                            title="关闭窗口">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4l12 12M16 4L4 16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 状态栏 -->
+        <div class="status-bar" role="status">
+            <div class="status-container">
+                <div class="status-items">
+                    <div class="status-item" data-status="image-detection">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                        </div>
+                        <span class="status-text">图片定位</span>
+                        <div class="status-description">检测试卷图片</div>
+                    </div>
+
+                    <div class="status-divider"></div>
+
+                    <div class="status-item" data-status="ai-connection">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                        </div>
+                        <span class="status-text">AI链接</span>
+                        <div class="status-description">连接AI服务</div>
+                    </div>
+
+                    <div class="status-divider"></div>
+
+                    <div class="status-item" data-status="config-loaded">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                        </div>
+                        <span class="status-text">配置就绪</span>
+                        <div class="status-description">加载配置文件</div>
+                    </div>
+
+                    <div class="status-divider"></div>
+
+                    <div class="status-item" data-status="api-keys">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                        </div>
+                        <span class="status-text">API密钥</span>
+                        <div class="status-description">检查API配置</div>
+                    </div>
+                </div>
+
+                <div class="status-info">
+                    <div class="current-time" id="current-time"></div>
+                    <div class="session-info">
+                        <span class="session-duration">运行时长: <span id="session-duration">0:00</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content" role="main">
+            <!-- 标签页导航 -->
+            <nav class="tab-navigation" role="tablist">
+                <div class="tab-container">
+                    <button class="tab-btn active"
+                            role="tab"
+                            data-tab="ai-grading"
+                            aria-selected="true"
+                            aria-controls="panel-ai-grading"
+                            id="tab-ai-grading">
+                        <div class="tab-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L9 17l-3-3m0-6l3 3m0 6l3 3m-3-3H3"/>
+                            </svg>
+                        </div>
+                        <span class="tab-label">智能阅卷</span>
+                        <div class="tab-badge" id="ai-grading-badge" style="display: none;">0</div>
+                    </button>
+
+                    <button class="tab-btn"
+                            role="tab"
+                            data-tab="manual-review"
+                            aria-selected="false"
+                            aria-controls="panel-manual-review"
+                            id="tab-manual-review">
+                        <div class="tab-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12h6m-6 4h6M2 7h10a2 2 0 012 2v10a2 2 0 01-2 2H2a2 2 0 01-2-2V9a2 2 0 012-2z"/>
+                            </svg>
+                        </div>
+                        <span class="tab-label">人工复核</span>
+                        <div class="tab-badge" id="manual-review-badge" style="display: none;">0</div>
+                    </button>
+
+                    <button class="tab-btn"
+                            role="tab"
+                            data-tab="data-analysis"
+                            aria-selected="false"
+                            aria-controls="panel-data-analysis"
+                            id="tab-data-analysis">
+                        <div class="tab-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 8v8m-4-5v10m-4-15v8m-4 5h18M2 16h20"/>
+                            </svg>
+                        </div>
+                        <span class="tab-label">数据分析</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- 内容面板 -->
+            <div class="content-panels">
+                <!-- AI智能阅卷面板 -->
+                <section class="content-panel active"
+                         id="panel-ai-grading"
+                         role="tabpanel"
+                         aria-labelledby="tab-ai-grading"
+                         aria-hidden="false">
+                    <div class="panel-content">
+                        <!-- 面板头部 -->
+                        <div class="panel-header">
+                            <div class="panel-title-section">
+                                <h2 class="panel-title">AI智能阅卷</h2>
+                                <p class="panel-description">使用深度学习技术自动评分试卷</p>
+                            </div>
+
+                            <div class="panel-stats">
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M13 8V2l-5.5 9H5a2 2 0 00-2 2v4a2 2 0 002 2h4a2 2 0 002-2V2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-value" id="today-graded">0</span>
+                                        <span class="stat-label">今日已阅</span>
+                                    </div>
+                                </div>
+
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="8" cy="8" r="8"/>
+                                            <path d="M8 5v3M8 8v3m0 3v3"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-value" id="avg-time">--</span>
+                                        <span class="stat-label">平均用时</span>
+                                    </div>
+                                </div>
+
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M8 12l2 2m0-4l-2-2m0-4L2 8m10 4v2M2 8l6 6"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-value" id="accuracy">--</span>
+                                        <span class="stat-label">准确率</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 上传区域 -->
+                        <div class="upload-section">
+                            <div class="upload-area" id="upload-area">
+                                <div class="upload-content">
+                                    <div class="upload-icon">
+                                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                                            <path d="M7 10l5 5 5-5M7 14l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </div>
+                                    <h3 class="upload-title">拖拽图片到此处</h3>
+                                    <p class="upload-description">或点击选择文件，支持 JPG、PNG、GIF 格式</p>
+                                    <p class="upload-limits">最大 10MB，最多 20 张</p>
+
+                                    <div class="upload-buttons">
+                                        <button class="upload-btn primary" id="upload-btn">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M7 16a4 4 0 01-.88 7.64M15 16a4 4 0 00-.88-7.64M15 12V4a2 2 0 00-2-2H7a2 2 0 00-2 2v8"/>
+                                                <path d="M8 12h8"/>
+                                                <path d="M10 8v8"/>
+                                            </svg>
+                                            <span class="btn-text">选择文件</span>
+                                        </button>
+                                        <button class="upload-btn secondary" id="folder-btn">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-1M10 2v8"/>
+                                            </svg>
+                                            <span class="btn-text">打开文件夹</span>
+                                        </button>
+                                    </div>
+
+                                    <input type="file"
+                                           id="file-input"
+                                           class="file-input"
+                                           accept="image/jpeg,image/jpg,image/png,image/gif"
+                                           multiple
+                                           aria-label="选择图片文件">
+                                </div>
+
+                                <div class="upload-progress" id="upload-progress" style="display: none;">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="progress-fill"></div>
+                                    </div>
+                                    <div class="progress-text">
+                                        <span id="progress-text">准备上传...</span>
+                                        <span class="progress-percent" id="progress-percent">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 图片预览区域 -->
+                        <div class="preview-section" id="preview-section" style="display: none;">
+                            <div class="preview-header">
+                                <h3>图片预览</h3>
+                                <div class="preview-controls">
+                                    <button class="control-btn select-all" id="select-all-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 8l8 8m0-8l-8 8"/>
+                                        </svg>
+                                        <span>全选</span>
+                                    </button>
+                                    <button class="control-btn clear-all" id="clear-all-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M2 2l12 12M14 2L2 14"/>
+                                        </svg>
+                                        <span>清除</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="preview-grid" id="preview-grid">
+                                <!-- 预览图片将动态添加到这里 -->
+                            </div>
+                        </div>
+
+                        <!-- 阅卷操作区域 -->
+                        <div class="action-section" id="action-section" style="display: none;">
+                            <div class="action-header">
+                                <h3>阅卷操作</h3>
+                                <div class="batch-actions">
+                                    <button class="action-btn batch-select" id="batch-select-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 8l8 8m0-8l-8 8"/>
+                                        </svg>
+                                        <span>批量选择</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="action-btn primary ai-trial" id="ai-trial-btn">
+                                    <div class="btn-icon">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="btn-text">AI试评</span>
+                                    <span class="btn-description">快速预览评分</span>
+                                </button>
+
+                                <button class="action-btn secondary auto-grade" id="auto-grade-btn">
+                                    <div class="btn-icon">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="btn-text">自动阅卷</span>
+                                    <span class="btn-description">开始批量评分</span>
+                                </button>
+
+                                <button class="action-btn secondary export-results" id="export-results-btn" disabled>
+                                    <div class="btn-icon">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H9l-2 2v10a2 2 0 002 2z"/>
+                                            <path d="M9 9l6 6m0-6l-6 6"/>
+                                        </svg>
+                                    </div>
+                                    <span class="btn-text">导出结果</span>
+                                    <span class="btn-description">生成评分报告</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 评分结果区域 -->
+                        <div class="results-section" id="results-section" style="display: none;">
+                            <div class="results-header">
+                                <h3>评分结果</h3>
+                                <div class="results-controls">
+                                    <button class="control-btn refresh-results" id="refresh-results-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 4v12h12M4 8h12M8 4v12"/>
+                                        </svg>
+                                    </button>
+                                    <button class="control-btn clear-results" id="clear-results-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M2 2l12 12M14 2L2 14"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="results-grid" id="results-grid">
+                                <!-- 评分结果将动态添加到这里 -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 人工复核面板 -->
+                <section class="content-panel"
+                         id="panel-manual-review"
+                         role="tabpanel"
+                         aria-labelledby="tab-manual-review"
+                         aria-hidden="true">
+                    <div class="panel-content">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2 2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.707.293V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <h3>人工复核功能</h3>
+                            <p>查看和调整AI评分结果的功能正在开发中...</p>
+                            <div class="empty-actions">
+                                <button class="action-btn primary" disabled>
+                                    <span>功能开发中</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 数据分析面板 -->
+                <section class="content-panel"
+                         id="panel-data-analysis"
+                         role="tabpanel"
+                         aria-labelledby="tab-data-analysis"
+                         aria-hidden="true">
+                    <div class="panel-content">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                                    <path d="M16 8v8m-4-5v10m-4 5h18M2 16h20"/>
+                                </svg>
+                            </div>
+                            <h3>数据分析功能</h3>
+                            <p>评分统计、趋势图表和数据导出功能正在开发中...</p>
+                            <div class="empty-actions">
+                                <button class="action-btn primary" disabled>
+                                    <span>功能开发中</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

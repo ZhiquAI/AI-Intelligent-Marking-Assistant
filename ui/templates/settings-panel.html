@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智学AI - 设置面板</title>
+</head>
+<body>
+    <div class="settings-panel-wrapper">
+        <div class="settings-header" data-ref="header">
+            <h2 class="settings-title" data-ref="title">
+                <span class="icon">⚙️</span>
+                智学AI 设置
+            </h2>
+            <button class="close-btn" data-ref="closeBtn" title="关闭">
+                <span class="icon">×</span>
+            </button>
+        </div>
+
+        <div class="settings-body">
+            <!-- 标签页导航 -->
+            <div class="tab-navigation" data-ref="tabContainer">
+                <button class="tab-btn active" data-tab="general" data-ref="generalTab">
+                    <span class="tab-icon">🏠</span>
+                    <span class="tab-label">常规</span>
+                </button>
+                <button class="tab-btn" data-tab="ai" data-ref="aiTab">
+                    <span class="tab-icon">🤖</span>
+                    <span class="tab-label">AI配置</span>
+                </button>
+                <button class="tab-btn" data-tab="security" data-ref="securityTab">
+                    <span class="tab-icon">🔒</span>
+                    <span class="tab-label">安全</span>
+                </button>
+                <button class="tab-btn" data-tab="ui" data-ref="uiTab">
+                    <span class="tab-icon">🎨</span>
+                    <span class="tab-label">界面</span>
+                </button>
+                <button class="tab-btn" data-tab="about" data-ref="aboutTab">
+                    <span class="tab-icon">ℹ️</span>
+                    <span class="tab-label">关于</span>
+                </button>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="settings-content" data-ref="contentContainer">
+                <!-- 常规设置 -->
+                <div class="tab-content active" data-content="general" data-ref="generalContent">
+                    <div class="content-section">
+                        <h3 class="section-title">外观设置</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="theme-select">
+                                <span class="label-text">主题</span>
+                                <span class="label-desc">选择界面主题</span>
+                            </label>
+                            <select id="theme-select" class="setting-select" data-setting="general.theme">
+                                <option value="auto">自动</option>
+                                <option value="light">浅色</option>
+                                <option value="dark">深色</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="language-select">
+                                <span class="label-text">语言</span>
+                                <span class="label-desc">选择界面语言</span>
+                            </label>
+                            <select id="language-select" class="setting-select" data-setting="general.language">
+                                <option value="zh-CN">简体中文</option>
+                                <option value="zh-TW">繁体中文</option>
+                                <option value="en-US">English</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <h3 class="section-title">行为设置</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label checkbox-label">
+                                <input type="checkbox" class="setting-checkbox" data-setting="general.autoSave">
+                                <span class="checkmark"></span>
+                                <span class="label-text">自动保存设置</span>
+                                <span class="label-desc">设置更改时自动保存</span>
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label checkbox-label">
+                                <input type="checkbox" class="setting-checkbox" data-setting="general.notifications">
+                                <span class="checkmark"></span>
+                                <span class="label-text">启用通知</span>
+                                <span class="label-desc">显示操作结果通知</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI配置 -->
+                <div class="tab-content" data-content="ai" data-ref="aiContent">
+                    <div class="content-section">
+                        <h3 class="section-title">默认AI模型</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="default-provider">
+                                <span class="label-text">默认提供商</span>
+                                <span class="label-desc">选择默认的AI服务提供商</span>
+                            </label>
+                            <select id="default-provider" class="setting-select" data-setting="ai.defaultProvider">
+                                <option value="openai">OpenAI GPT</option>
+                                <option value="gemini">Google Gemini</option>
+                                <option value="qwen">阿里云通义千问</option>
+                                <option value="zhipuai">智谱AI</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <h3 class="section-title">模型参数</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="temperature-slider">
+                                <span class="label-text">Temperature</span>
+                                <span class="label-desc">控制输出的随机性 (0-2)</span>
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="temperature-slider" class="setting-slider"
+                                       data-setting="ai.temperature" min="0" max="2" step="0.1">
+                                <span class="slider-value">0.7</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="max-tokens">
+                                <span class="label-text">最大Token数</span>
+                                <span class="label-desc">生成文本的最大长度</span>
+                            </label>
+                            <input type="number" id="max-tokens" class="setting-input"
+                                   data-setting="ai.maxTokens" min="100" max="32000" step="100">
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="timeout">
+                                <span class="label-text">请求超时</span>
+                                <span class="label-desc">AI请求超时时间 (毫秒)</span>
+                            </label>
+                            <input type="number" id="timeout" class="setting-input"
+                                   data-setting="ai.timeout" min="5000" max="120000" step="5000">
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <h3 class="section-title">AI提供商状态</h3>
+                        <div class="provider-status-list">
+                            <!-- 动态生成提供商状态 -->
+                        </div>
+
+                        <button class="btn btn-primary key-management-btn" data-ref="keyManagementBtn">
+                            <span class="icon">🔑</span>
+                            密钥管理
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 安全设置 -->
+                <div class="tab-content" data-content="security" data-ref="securityContent">
+                    <div class="content-section">
+                        <h3 class="section-title">安全选项</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label checkbox-label">
+                                <input type="checkbox" class="setting-checkbox" data-setting="security.enableLogging">
+                                <span class="checkmark"></span>
+                                <span class="label-text">启用安全日志</span>
+                                <span class="label-desc">记录安全相关事件</span>
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label checkbox-label">
+                                <input type="checkbox" class="setting-checkbox" data-setting="security.enforceCSP">
+                                <span class="checkmark"></span>
+                                <span class="label-text">强制CSP策略</span>
+                                <span class="label-desc">严格的内容安全策略</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <h3 class="section-title">密钥安全</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="key-rotation">
+                                <span class="label-text">密钥轮换周期</span>
+                                <span class="label-desc">自动更换密钥的天数</span>
+                            </label>
+                            <input type="number" id="key-rotation" class="setting-input"
+                                   data-setting="security.keyRotationDays" min="7" max="365">
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="session-timeout">
+                                <span class="label-text">会话超时</span>
+                                <span class="label-desc">会话超时时间 (毫秒)</span>
+                            </label>
+                            <input type="number" id="session-timeout" class="setting-input"
+                                   data-setting="security.sessionTimeout" min="300000" max="86400000" step="60000">
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <h3 class="section-title">安全状态</h3>
+                        <div class="security-status-grid">
+                            <div class="status-item">
+                                <span class="status-label">内容安全策略 (CSP)</span>
+                                <span class="security-status" data-security-status="csp">检查中...</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">消息验证</span>
+                                <span class="security-status" data-security-status="messaging">检查中...</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">密钥管理</span>
+                                <span class="security-status" data-security-status="keyManagement">检查中...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 界面设置 -->
+                <div class="tab-content" data-content="ui" data-ref="uiContent">
+                    <div class="content-section">
+                        <h3 class="section-title">界面布局</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="position-select">
+                                <span class="label-text">面板位置</span>
+                                <span class="label-desc">设置面板默认位置</span>
+                            </label>
+                            <select id="position-select" class="setting-select" data-setting="ui.position">
+                                <option value="top-right">右上角</option>
+                                <option value="top-left">左上角</option>
+                                <option value="bottom-right">右下角</option>
+                                <option value="bottom-left">左下角</option>
+                                <option value="center">居中</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <h3 class="section-title">交互体验</h3>
+
+                        <div class="setting-group">
+                            <label class="setting-label checkbox-label">
+                                <input type="checkbox" class="setting-checkbox" data-setting="ui.compactMode">
+                                <span class="checkmark"></span>
+                                <span class="label-text">紧凑模式</span>
+                                <span class="label-desc">使用更紧凑的界面布局</span>
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label checkbox-label">
+                                <input type="checkbox" class="setting-checkbox" data-setting="ui.showTooltips">
+                                <span class="checkmark"></span>
+                                <span class="label-text">显示工具提示</span>
+                                <span class="label-desc">鼠标悬停显示帮助信息</span>
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="animation-speed">
+                                <span class="label-text">动画速度</span>
+                                <span class="label-desc">界面动画的播放速度</span>
+                            </label>
+                            <select id="animation-speed" class="setting-select" data-setting="ui.animationSpeed">
+                                <option value="slow">慢速</option>
+                                <option value="normal">正常</option>
+                                <option value="fast">快速</option>
+                                <option value="none">无动画</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 关于 -->
+                <div class="tab-content" data-content="about" data-ref="aboutContent">
+                    <div class="content-section">
+                        <div class="about-header">
+                            <div class="logo-container">
+                                <span class="logo-icon">🎓</span>
+                                <h3 class="app-name">智学AI</h3>
+                            </div>
+                            <p class="app-description">智能作业批改助手</p>
+                            <p class="app-version">版本 {{version}}</p>
+                        </div>
+
+                        <div class="about-info">
+                            <div class="info-section">
+                                <h4 class="info-title">功能特性</h4>
+                                <ul class="feature-list">
+                                    <li>🤖 多AI模型支持 (GPT-4o, Gemini, 通义千问, 智谱AI)</li>
+                                    <li>📝 智能作业批改和分析</li>
+                                    <li>🔒 企业级安全保护</li>
+                                    <li>🎨 现代化用户界面</li>
+                                    <li>⚡ 高性能和低延迟</li>
+                                </ul>
+                            </div>
+
+                            <div class="info-section">
+                                <h4 class="info-title">技术栈</h4>
+                                <ul class="tech-list">
+                                    <li>Manifest V3 Chrome Extension</li>
+                                    <li>模块化组件架构</li>
+                                    <li>内容安全策略 (CSP)</li>
+                                    <li>AES-256-GCM 加密</li>
+                                    <li>响应式设计</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="about-actions">
+                            <button class="btn btn-outline" onclick="window.open('https://github.com/ZhixueAI', '_blank')">
+                                <span class="icon">🔗</span>
+                                访问主页
+                            </button>
+                            <button class="btn btn-outline" onclick="window.open('https://github.com/ZhixueAI/issues', '_blank')">
+                                <span class="icon">🐛</span>
+                                报告问题
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部操作按钮 -->
+        <div class="settings-footer">
+            <div class="save-status" data-ref="saveStatus"></div>
+            <div class="footer-actions">
+                <button class="btn btn-outline reset-btn" data-ref="resetBtn">
+                    <span class="icon">🔄</span>
+                    重置
+                </button>
+                <button class="btn btn-outline cancel-btn" data-ref="cancelBtn">
+                    <span class="icon">❌</span>
+                    取消
+                </button>
+                <button class="btn btn-primary save-btn" data-ref="saveBtn">
+                    <span class="icon">💾</span>
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 基础样式 */
+        .settings-panel-wrapper {
+            width: 600px;
+            max-width: 90vw;
+            max-height: 80vh;
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            font-family: var(--font-family);
+        }
+
+        /* 头部 */
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .settings-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .settings-title .icon {
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        /* 标签页导航 */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 80px;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-500);
+            background: var(--primary-50);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-500);
+        }
+
+        .tab-icon {
+            font-size: 1.25rem;
+        }
+
+        .tab-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* 内容区域 */
+        .settings-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content-section {
+            margin-bottom: 2rem;
+        }
+
+        .content-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 设置组 */
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .label-text {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .label-desc {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* 复选框样式 */
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            transition: background-color 0.2s ease;
+        }
+
+        .checkbox-label:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .setting-checkbox {
+            display: none;
+        }
+
+        .checkmark {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+            transition: all 0.2s ease;
+        }
+
+        .setting-checkbox:checked + .checkmark {
+            background: var(--primary-500);
+            border-color: var(--primary-500);
+        }
+
+        .setting-checkbox:checked + .checkmark::after {
+            content: '✓';
+            color: white;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        /* 输入控件 */
+        .setting-input,
+        .setting-select {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .setting-input:focus,
+        .setting-select:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 滑块样式 */
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .setting-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .setting-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-500);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .setting-slider::-webkit-slider-thumb:hover {
+            background: var(--primary-600);
+        }
+
+        .slider-value {
+            min-width: 3rem;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-500);
+            color: white;
+            border-color: var(--primary-500);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* 密钥管理按钮 */
+        .key-management-btn {
+            width: 100%;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        /* 状态显示 */
+        .provider-status-list,
+        .security-status-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+        }
+
+        .security-status,
+        .provider-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .security-status.healthy,
+        .provider-status.connected {
+            background: var(--success-100);
+            color: var(--success-700);
+        }
+
+        .security-status.warning,
+        .provider-status.warning {
+            background: var(--warning-100);
+            color: var(--warning-700);
+        }
+
+        .security-status.error,
+        .provider-status.error {
+            background: var(--error-100);
+            color: var(--error-700);
+        }
+
+        /* 关于页面 */
+        .about-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-container {
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .app-description {
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+        }
+
+        .app-version {
+            color: var(--text-tertiary);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .about-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-list,
+        .tech-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li,
+        .tech-list li {
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .about-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* 底部操作区 */
+        .settings-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .save-status {
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .save-status.saving {
+            background: var(--info-100);
+            color: var(--info-700);
+        }
+
+        .save-status.success {
+            background: var(--success-100);
+            color: var(--success-700);
+        }
+
+        .save-status.error {
+            background: var(--error-100);
+            color: var(--error-700);
+        }
+
+        .save-status.reset {
+            background: var(--warning-100);
+            color: var(--warning-700);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 640px) {
+            .settings-panel-wrapper {
+                width: 95vw;
+                max-height: 90vh;
+            }
+
+            .about-info {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .tab-navigation {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .settings-content {
+                max-height: 300px;
+            }
+        }
+
+        /* 深色主题 */
+        [data-theme="dark"] .settings-panel-wrapper,
+        .zhixue-settings-panel[data-theme="dark"] .settings-panel-wrapper {
+            background: var(--bg-primary-dark);
+            border-color: var(--border-color-dark);
+        }
+
+        [data-theme="dark"] .settings-header,
+        [data-theme="dark"] .tab-navigation,
+        [data-theme="dark"] .settings-footer,
+        .zhixue-settings-panel[data-theme="dark"] .settings-header,
+        .zhixue-settings-panel[data-theme="dark"] .tab-navigation,
+        .zhixue-settings-panel[data-theme="dark"] .settings-footer {
+            background: var(--bg-secondary-dark);
+            border-color: var(--border-color-dark);
+        }
+
+        [data-theme="dark"] .tab-btn.active,
+        .zhixue-settings-panel[data-theme="dark"] .tab-btn.active {
+            background: var(--primary-900);
+        }
+
+        [data-theme="dark"] .status-item,
+        .zhixue-settings-panel[data-theme="dark"] .status-item {
+            background: var(--bg-tertiary-dark);
+        }
+    </style>
+</body>
+</html>

@@ -8,6 +8,9 @@
   "action": {
     "default_title": "AI智能阅卷助手"
   },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests; connect-src 'self' https://api.openai.com https://generativelanguage.googleapis.com https://dashscope.aliyuncs.com https://open.bigmodel.cn; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self'; worker-src 'self';"
+  },
   "background": {
     "service_worker": "background.js",
     "type": "module"

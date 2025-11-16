@@ -1,0 +1,638 @@
+/**
+ * 智学AI - 状态指示器样式
+ * 通知、状态和进度条的可视化样式
+ */
+
+/* 导入变量 */
+@import '../shared/variables.css';
+
+/* 主容器 */
+.zhixue-status-indicator {
+    position: fixed;
+    z-index: 2147483646;
+    pointer-events: none;
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-base);
+    max-width: 400px;
+    min-width: 200px;
+}
+
+/* 位置变体 */
+.zhixue-status-indicator.position-top-right {
+    top: 20px;
+    right: 20px;
+}
+
+.zhixue-status-indicator.position-top-left {
+    top: 20px;
+    left: 20px;
+}
+
+.zhixue-status-indicator.position-bottom-right {
+    bottom: 20px;
+    right: 20px;
+}
+
+.zhixue-status-indicator.position-bottom-left {
+    bottom: 20px;
+    left: 20px;
+}
+
+.zhixue-status-indicator.position-top-center {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.zhixue-status-indicator.position-bottom-center {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* 容器 */
+.notifications-container,
+.status-container,
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: auto;
+}
+
+/* 通知样式 */
+.status-notification {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+    animation: notificationSlideIn var(--transition-normal) var(--ease-out);
+    transition: all var(--transition-normal) var(--ease-in-out);
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.status-notification:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+/* 通知类型样式 */
+.status-notification.success {
+    border-left: 4px solid var(--success-500);
+    background: var(--success-50);
+}
+
+.status-notification.error {
+    border-left: 4px solid var(--error-500);
+    background: var(--error-50);
+}
+
+.status-notification.warning {
+    border-left: 4px solid var(--warning-500);
+    background: var(--warning-50);
+}
+
+.status-notification.info {
+    border-left: 4px solid var(--info-500);
+    background: var(--info-50);
+}
+
+/* 通知标题 */
+.notification-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    font-size: var(--font-size-base);
+    line-height: 1.3;
+}
+
+/* 通知消息 */
+.notification-message {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+}
+
+/* 通知关闭按钮 */
+.notification-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-tertiary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    line-height: 1;
+    transition: all var(--transition-fast) var(--ease-in-out);
+}
+
+.notification-close:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.notification-close:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* 状态指示器 */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    animation: statusFadeIn var(--transition-normal) var(--ease-out);
+    transition: all var(--transition-fast) var(--ease-in-out);
+    cursor: default;
+}
+
+.status-indicator:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 状态类型 */
+.status-indicator.success {
+    background: var(--success-100);
+    border-color: var(--success-300);
+    color: var(--success-700);
+}
+
+.status-indicator.error {
+    background: var(--error-100);
+    border-color: var(--error-300);
+    color: var(--error-700);
+}
+
+.status-indicator.warning {
+    background: var(--warning-100);
+    border-color: var(--warning-300);
+    color: var(--warning-700);
+}
+
+.status-indicator.info {
+    background: var(--info-100);
+    border-color: var(--info-300);
+    color: var(--info-700);
+}
+
+.status-indicator.loading {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.status-indicator.connected {
+    background: var(--success-100);
+    border-color: var(--success-300);
+    color: var(--success-700);
+}
+
+.status-indicator.disconnected {
+    background: var(--error-100);
+    border-color: var(--error-300);
+    color: var(--error-700);
+}
+
+.status-indicator.syncing {
+    background: var(--info-100);
+    border-color: var(--info-300);
+    color: var(--info-700);
+}
+
+/* 状态图标 */
+.status-icon {
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 状态消息 */
+.status-message {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: inherit;
+}
+
+/* 脉冲动画 */
+.status-indicator.pulsing {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* 连接状态特殊样式 */
+.status-indicator.connected .status-icon {
+    color: var(--success-600);
+}
+
+.status-indicator.disconnected .status-icon {
+    color: var(--error-600);
+}
+
+.status-indicator.syncing .status-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 进度指示器 */
+.progress-indicator {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    box-shadow: var(--shadow-md);
+    animation: progressSlideIn var(--transition-normal) var(--ease-out);
+    transition: all var(--transition-normal) var(--ease-in-out);
+}
+
+.progress-indicator:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 进度标签 */
+.progress-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: var(--font-size-sm);
+}
+
+/* 进度条容器 */
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+/* 进度条 */
+.progress-bar {
+    height: 100%;
+    background: var(--primary-500);
+    border-radius: 3px;
+    transition: width var(--transition-normal) var(--ease-out);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* 进度类型样式 */
+.progress-indicator.success .progress-bar {
+    background: var(--success-500);
+}
+
+.progress-indicator.error .progress-bar {
+    background: var(--error-500);
+}
+
+.progress-indicator.warning .progress-bar {
+    background: var(--warning-500);
+}
+
+.progress-indicator.info .progress-bar {
+    background: var(--info-500);
+}
+
+/* 进度百分比 */
+.progress-percentage {
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* 入场动画 */
+@keyframes notificationSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+    }
+}
+
+@keyframes statusFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes progressSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+    }
+}
+
+/* 退场动画 */
+.status-notification.hiding,
+.status-indicator.hiding,
+.progress-indicator.hiding {
+    animation: hideAnimation var(--transition-normal) var(--ease-in);
+}
+
+@keyframes hideAnimation {
+    from {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%) translateY(-20px);
+    }
+}
+
+/* 主题变体 */
+.zhixue-status-indicator.theme-dark {
+    /* 深色主题覆盖 */
+}
+
+.zhixue-status-indicator.theme-dark .status-notification {
+    background: var(--bg-primary-dark);
+    border-color: var(--border-color-dark);
+    color: var(--text-primary-dark);
+}
+
+.zhixue-status-indicator.theme-dark .status-indicator {
+    background: var(--bg-primary-dark);
+    border-color: var(--border-color-dark);
+    color: var(--text-primary-dark);
+}
+
+.zhixue-status-indicator.theme-dark .progress-indicator {
+    background: var(--bg-primary-dark);
+    border-color: var(--border-color-dark);
+}
+
+.zhixue-status-indicator.theme-dark .progress-bar-container {
+    background: var(--bg-tertiary-dark);
+}
+
+.zhixue-status-indicator.theme-dark .notification-title {
+    color: var(--text-primary-dark);
+}
+
+.zhixue-status-indicator.theme-dark .notification-message {
+    color: var(--text-secondary-dark);
+}
+
+/* 紧凑模式 */
+.zhixue-status-indicator.compact .status-notification {
+    padding: 0.75rem;
+}
+
+.zhixue-status-indicator.compact .status-indicator {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+}
+
+.zhixue-status-indicator.compact .progress-indicator {
+    padding: 0.75rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .zhixue-status-indicator {
+        max-width: calc(100vw - 40px);
+        min-width: 280px;
+    }
+
+    .zhixue-status-indicator.position-top-right,
+    .zhixue-status-indicator.position-top-left,
+    .zhixue-status-indicator.position-top-center {
+        top: 10px;
+    }
+
+    .zhixue-status-indicator.position-bottom-right,
+    .zhixue-status-indicator.position-bottom-left,
+    .zhixue-status-indicator.position-bottom-center {
+        bottom: 10px;
+    }
+
+    .zhixue-status-indicator.position-top-left,
+    .zhixue-status-indicator.position-bottom-left {
+        left: 10px;
+    }
+
+    .zhixue-status-indicator.position-top-right,
+    .zhixue-status-indicator.position-bottom-right {
+        right: 10px;
+    }
+
+    .status-notification {
+        padding: 0.875rem;
+    }
+
+    .status-indicator {
+        padding: 0.4375rem 0.6875rem;
+        font-size: 0.8125rem;
+    }
+
+    .progress-indicator {
+        padding: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .zhixue-status-indicator {
+        min-width: calc(100vw - 20px);
+        max-width: none;
+        left: 10px !important;
+        right: 10px !important;
+        transform: none !important;
+    }
+
+    .status-notification {
+        padding: 0.75rem;
+    }
+
+    .notification-title {
+        font-size: var(--font-size-sm);
+    }
+
+    .notification-message {
+        font-size: 0.8125rem;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .status-notification,
+    .status-indicator,
+    .progress-indicator {
+        border-width: 2px;
+    }
+
+    .status-notification.success,
+    .status-indicator.success {
+        border-color: var(--success-600);
+    }
+
+    .status-notification.error,
+    .status-indicator.error {
+        border-color: var(--error-600);
+    }
+
+    .status-notification.warning,
+    .status-indicator.warning {
+        border-color: var(--warning-600);
+    }
+
+    .status-notification.info,
+    .status-indicator.info {
+        border-color: var(--info-600);
+    }
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+    .status-notification,
+    .status-indicator,
+    .progress-indicator {
+        animation: none;
+        transition: none;
+    }
+
+    .progress-bar {
+        transition: none;
+    }
+
+    .progress-bar::after {
+        animation: none;
+    }
+
+    .status-indicator.pulsing,
+    .status-indicator.syncing .status-icon {
+        animation: none;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .zhixue-status-indicator {
+        display: none !important;
+    }
+}
+
+/* 无障碍支持 */
+.status-notification:focus-within,
+.status-indicator:focus {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+/* 触摸设备优化 */
+@media (pointer: coarse) {
+    .status-notification,
+    .status-indicator,
+    .progress-indicator {
+        /* 增大触摸目标 */
+        min-height: 44px;
+    }
+
+    .notification-close {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+/* 容器溢出处理 */
+.notifications-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.notifications-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.notifications-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notifications-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+.notifications-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
