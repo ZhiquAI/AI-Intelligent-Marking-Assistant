@@ -1,0 +1,56 @@
+<div class="zhixue-ai-main-content">
+  <div class="zhixue-ai-header">
+    <div class="zhixue-ai-logo">
+      <div class="zhixue-ai-logo-icon">AI</div>
+      <div class="zhixue-ai-logo-text"><h1>AI智能阅卷助手</h1></div>
+    </div>
+    <div class="zhixue-ai-header-actions">
+      <button class="zhixue-ai-settings-btn" id="modelSettingsBtn" title="模型设置">⚙️</button>
+      <button class="zhixue-ai-close">&times;</button>
+    </div>
+  </div>
+
+  <div class="zhixue-ai-status-bar">
+    <div class="zhixue-ai-status-items">
+      <div class="zhixue-ai-status-item"><div class="zhixue-ai-status-dot"></div><span class="zhixue-ai-status-text">图片定位</span></div>
+      <div class="zhixue-ai-status-divider"></div>
+      <div class="zhixue-ai-status-item"><div class="zhixue-ai-status-dot"></div><span class="zhixue-ai-status-text">AI链接</span></div>
+      <div class="zhixue-ai-status-divider"></div>
+      <div class="zhixue-ai-status-item"><div class="zhixue-ai-status-dot"></div><span class="zhixue-ai-status-text">评分设置</span></div>
+    </div>
+  </div>
+
+  <div class="zhixue-ai-tabs">
+    <div class="zhixue-ai-tab-list">
+      <div class="zhixue-ai-tab active" data-tab="grading">智能阅卷</div>
+      <div class="zhixue-ai-tab" data-tab="review">人工复核</div>
+      <div class="zhixue-ai-tab" data-tab="analysis">数据分析</div>
+    </div>
+  </div>
+
+  <div class="zhixue-ai-content">
+    <div id="tab-grading" class="tab-content" style="display:block;">
+      <div class="zhixue-ai-card">
+        <div class="zhixue-ai-card-title">阅卷操作</div>
+        <div class="zhixue-ai-buttons">
+          <button class="zhixue-ai-button zhixue-ai-button-try" id="aiTrialBtn">AI试评</button>
+          <button class="zhixue-ai-button zhixue-ai-button-auto" id="aiAutoGradeBtn">自动阅卷</button>
+        </div>
+      </div>
+
+      <div id="score-panel-container"></div>
+    </div>
+    <div id="tab-review" class="tab-content" style="display:none;">
+      <div class="zhixue-ai-card">
+        <div class="zhixue-ai-card-title">人工复核</div>
+        <p style="color:#64748b;font-size:14px;margin:0;">功能开发中，敬请期待...</p>
+      </div>
+    </div>
+    <div id="tab-analysis" class="tab-content" style="display:none;">
+      <div class="zhixue-ai-card">
+        <div class="zhixue-ai-card-title">数据分析</div>
+        <p style="color:#64748b;font-size:14px;margin:0;">功能开发中，敬请期待...</p>
+      </div>
+    </div>
+  </div>
+</div>

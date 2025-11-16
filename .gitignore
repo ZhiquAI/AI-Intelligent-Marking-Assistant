@@ -1,0 +1,69 @@
+# AI智能阅卷助手 - Git忽略文件
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE和编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+cache/
+
+# 依赖包
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建输出
+dist/
+build/
+out/
+
+# 测试覆盖率
+coverage/
+.nyc_output
+
+# 环境配置
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API密钥和配置
+config.json
+api-keys.json
+secrets.json
+*.pem
+*.key
+*.crt
+
+# Chrome扩展相关
+*.crx
+*.pem
+!extension.pem
+
+# 缓存
+.cache/
+.parcel-cache/
+
+# 其他
+*.tgz
+*.tar.gz

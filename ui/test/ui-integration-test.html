@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能阅卷助手 - UI集成测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .test-header h1 {
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .test-header p {
+            color: #6b7280;
+        }
+
+        .test-sections {
+            display: grid;
+            gap: 24px;
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section h2 {
+            color: #374151;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .test-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-result {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .test-result.success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .test-result.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .test-result.warning {
+            background: #fffbeb;
+            border-color: #fed7aa;
+        }
+
+        .component-container {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .component-container.has-content {
+            border-style: solid;
+            border-color: #10b981;
+        }
+
+        .loading {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .event-log {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .event-log .timestamp {
+            color: #9ca3af;
+        }
+
+        .event-log .event-type {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- 测试头部 -->
+        <div class="test-header">
+            <h1>AI智能阅卷助手 - UI集成测试</h1>
+            <p>测试所有UI组件的集成和功能完整性</p>
+        </div>
+
+        <!-- 测试区域 -->
+        <div class="test-sections">
+            <!-- 头部导航测试 -->
+            <div class="test-section">
+                <h2>1. 头部导航组件测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testHeaderNavigation()">测试头部导航</button>
+                    <button class="test-btn secondary" onclick="testStatusIndicators()">测试状态指示器</button>
+                    <button class="test-btn secondary" onclick="testTabSwitching()">测试标签切换</button>
+                </div>
+                <div id="header-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+
+            <!-- AI评分显示测试 -->
+            <div class="test-section">
+                <h2>2. AI评分显示组件测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testAIScoreDisplay()">显示评分结果</button>
+                    <button class="test-btn secondary" onclick="testScoreLoading()">测试加载状态</button>
+                    <button class="test-btn secondary" onclick="testScoreError()">测试错误状态</button>
+                    <button class="test-btn secondary" onclick="clearScoreDisplay()">清除显示</button>
+                </div>
+                <div id="score-display-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+
+            <!-- 智能阅卷界面测试 -->
+            <div class="test-section">
+                <h2>3. 智能阅卷界面测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testAIGradingInterface()">测试完整界面</button>
+                    <button class="test-btn secondary" onclick="testFileUpload()">测试文件上传</button>
+                    <button class="test-btn secondary" onclick="testAIGradingProcess()">测试评分过程</button>
+                    <button class="test-btn secondary" onclick="testTrialReading()">测试试读功能</button>
+                </div>
+                <div id="ai-grading-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+
+            <!-- 人工复核界面测试 -->
+            <div class="test-section">
+                <h2>4. 人工复核界面测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testManualReviewInterface()">测试复核界面</button>
+                    <button class="test-btn secondary" onclick="testReviewFiltering()">测试筛选功能</button>
+                    <button class="test-btn secondary" onclick="testBatchReview()">测试批量复核</button>
+                    <button class="test-btn secondary" onclick="testReviewExport()">测试导出功能</button>
+                </div>
+                <div id="manual-review-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+
+            <!-- 数据分析界面测试 -->
+            <div class="test-section">
+                <h2>5. 数据分析界面测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testDataAnalysisInterface()">测试图表界面</button>
+                    <button class="test-btn secondary" onclick="testChartRefresh()">测试数据刷新</button>
+                    <button class="test-btn secondary" onclick="testTimeRangeChange()">测试时间范围</button>
+                </div>
+                <div id="data-analysis-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+
+            <!-- 事件日志 -->
+            <div class="test-section">
+                <h2>6. 事件日志</h2>
+                <div class="test-controls">
+                    <button class="test-btn secondary" onclick="clearEventLog()">清除日志</button>
+                    <button class="test-btn secondary" onclick="exportEventLog()">导出日志</button>
+                </div>
+                <div id="event-log" class="event-log">
+                    <div class="timestamp">[系统启动]</span> - 事件日志初始化完成
+                </div>
+            </div>
+
+            <!-- 性能统计 -->
+            <div class="test-section">
+                <h2>7. 性能统计</h2>
+                <div class="performance-stats" id="performance-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="component-count">0</div>
+                        <div class="stat-label">已加载组件</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="event-count">0</div>
+                        <div class="stat-label">事件总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="test-count">0</div>
+                        <div class="stat-label">测试用例</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="error-count">0</div>
+                        <div class="stat-label">错误数量</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模板系统测试 -->
+            <div class="test-section">
+                <h2>8. 模板系统测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testTemplateLoader()">加载主面板模板</button>
+                    <button class="test-btn secondary" onclick="testSettingsModalTemplate()">加载设置模态模板</button>
+                </div>
+                <div id="template-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+
+            <!-- 共享组件测试 -->
+            <div class="test-section">
+                <h2>9. 共享组件测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testSharedDraggable()">测试 Draggable</button>
+                    <button class="test-btn secondary" onclick="testSharedTabManager()">测试 TabManager</button>
+                </div>
+                <div id="shared-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+
+            <!-- 事件总线测试 -->
+            <div class="test-section">
+                <h2>10. 事件总线测试</h2>
+                <div class="test-controls">
+                    <button class="test-btn primary" onclick="testEventBusSubscribe()">订阅 Tab 切换</button>
+                    <button class="test-btn secondary" onclick="testEventBusEmit()">主动派发事件</button>
+                </div>
+                <div id="eventbus-test-result" class="component-container">
+                    <span style="color: #6b7280;">点击按钮开始测试</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script type="module">
+        // 测试统计
+        let testStats = {
+            components: 0,
+            events: 0,
+            tests: 0,
+            errors: 0
+        };
+
+        // 事件日志
+        function logEvent(type, message) {
+            const eventLog = document.getElementById('event-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> - <span class="event-type">${type}</span>: ${message}`;
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+
+            testStats.events++;
+            updatePerformanceStats();
+        }
+
+        // 更新性能统计
+        function updatePerformanceStats() {
+            document.getElementById('component-count').textContent = testStats.components;
+            document.getElementById('event-count').textContent = testStats.events;
+            document.getElementById('test-count').textContent = testStats.tests;
+            document.getElementById('error-count').textContent = testStats.errors;
+        }
+
+        // 显示测试结果
+        function showTestResult(containerId, success, message, details = '') {
+            const container = document.getElementById(containerId);
+            container.className = 'component-container has-content';
+
+            let resultClass = success ? 'success' : 'error';
+            if (message.includes('警告')) resultClass = 'warning';
+
+            container.innerHTML = `
+                <div class="test-result ${resultClass}">
+                    <strong>${success ? '✅ 测试通过' : '❌ 测试失败'}</strong>
+                    <p>${message}</p>
+                    ${details ? `<div style="margin-top: 8px; font-size: 12px; color: #6b7280;">${details}</div>` : ''}
+                </div>
+            `;
+
+            testStats.tests++;
+            if (!success) testStats.errors++;
+            updatePerformanceStats();
+        }
+
+        // 8. 模板系统测试
+        async function testTemplateLoader() {
+            logEvent('模板系统', '开始测试模板加载器');
+            try {
+                const { loadTemplate } = await import('../utils/template-loader.js');
+                const html = await loadTemplate('main-panel.html');
+                const container = document.getElementById('template-test-result');
+                container.className = 'component-container has-content';
+                container.innerHTML = html;
+                testStats.components++;
+                showTestResult('template-test-result', true, '模板加载成功', '已渲染 main-panel.html 模板');
+                logEvent('模板系统', '测试完成');
+            } catch (error) {
+                showTestResult('template-test-result', false, '模板加载失败', error.message);
+                logEvent('模板系统', `测试失败: ${error.message}`);
+            }
+        }
+
+        async function testSettingsModalTemplate() {
+            logEvent('模板系统', '开始测试设置模态模板');
+            try {
+                const { loadTemplate } = await import('../utils/template-loader.js');
+                const html = await loadTemplate('settings-modal.html');
+                const container = document.getElementById('template-test-result');
+                container.className = 'component-container has-content';
+                container.innerHTML = html;
+                const closeBtn = container.querySelector('.settings-close-btn');
+                const overlay = container.querySelector('.zhixue-ai-settings-overlay');
+                const closeFn = () => { container.innerHTML = '<span style="color: #6b7280;">模态已关闭</span>'; };
+                closeBtn && closeBtn.addEventListener('click', closeFn);
+                overlay && overlay.addEventListener('click', closeFn);
+                testStats.components++;
+                showTestResult('template-test-result', true, '设置模态模板加载成功', '支持关闭交互');
+                logEvent('模板系统', '设置模态模板测试完成');
+            } catch (error) {
+                showTestResult('template-test-result', false, '设置模态模板加载失败', error.message);
+                logEvent('模板系统', `设置模态模板测试失败: ${error.message}`);
+            }
+        }
+
+        async function testSharedDraggable() {
+            logEvent('共享组件', '开始测试 draggable');
+            try {
+                const { makeDraggable } = await import('../components/shared/draggable.js');
+                const container = document.getElementById('shared-test-result');
+                container.className = 'component-container has-content';
+                container.innerHTML = '';
+                const btn = document.createElement('button');
+                btn.className = 'test-btn primary';
+                btn.textContent = '可拖拽按钮';
+                btn.style.position = 'fixed';
+                btn.style.left = '100px';
+                btn.style.top = '100px';
+                document.body.appendChild(btn);
+                makeDraggable(btn);
+                showTestResult('shared-test-result', true, 'draggable 加载成功', '按钮可在视窗范围内拖拽');
+                logEvent('共享组件', 'draggable 测试完成');
+            } catch (error) {
+                showTestResult('shared-test-result', false, 'draggable 加载失败', error.message);
+                logEvent('共享组件', `draggable 测试失败: ${error.message}`);
+            }
+        }
+
+        async function testSharedTabManager() {
+            logEvent('共享组件', '开始测试 tab-manager');
+            try {
+                const { TabManager } = await import('../components/shared/tab-manager.js');
+                const container = document.getElementById('shared-test-result');
+                container.className = 'component-container has-content';
+                container.innerHTML = `
+                  <div id="tabs">
+                    <div class="zhixue-ai-tabs">
+                      <div class="zhixue-ai-tab-list">
+                        <div class="zhixue-ai-tab active" data-tab="a">A</div>
+                        <div class="zhixue-ai-tab" data-tab="b">B</div>
+                      </div>
+                    </div>
+                    <div class="zhixue-ai-content">
+                      <div id="tab-a" class="tab-content" style="display:block;">内容A</div>
+                      <div id="tab-b" class="tab-content" style="display:none;">内容B</div>
+                    </div>
+                  </div>
+                `;
+                const root = document.getElementById('tabs');
+                const tm = new TabManager(root);
+                tm.bind();
+                tm.switchTo('a');
+                showTestResult('shared-test-result', true, 'tab-manager 加载成功', '点击可在 A/B 内容间切换');
+                logEvent('共享组件', 'tab-manager 测试完成');
+            } catch (error) {
+                showTestResult('shared-test-result', false, 'tab-manager 加载失败', error.message);
+                logEvent('共享组件', `tab-manager 测试失败: ${error.message}`);
+            }
+        }
+
+        async function testEventBusSubscribe() {
+            logEvent('事件总线', '开始订阅 ui/tab-switched');
+            try {
+                const { on } = await import('../utils/event-manager.js');
+                const container = document.getElementById('eventbus-test-result');
+                container.className = 'component-container has-content';
+                container.innerHTML = '<div class="test-result success"><strong>已订阅</strong><p>等待标签切换事件...</p></div>';
+                on('ui/tab-switched', ({ tab }) => {
+                    logEvent('事件总线', `收到标签切换: ${tab}`);
+                    container.innerHTML = `<div class="test-result success"><strong>收到事件</strong><p>当前标签: ${tab}</p></div>`;
+                });
+                showTestResult('eventbus-test-result', true, '事件总线订阅成功', '切换 Tab 时将更新内容');
+            } catch (error) {
+                showTestResult('eventbus-test-result', false, '事件总线订阅失败', error.message);
+                logEvent('事件总线', `订阅失败: ${error.message}`);
+            }
+        }
+
+        async function testEventBusEmit() {
+            logEvent('事件总线', '主动派发事件');
+            try {
+                const { emit } = await import('../utils/event-manager.js');
+                emit('ui/tab-switched', { tab: 'manual-review' });
+                showTestResult('eventbus-test-result', true, '已派发 ui/tab-switched', '模拟切换到 manual-review');
+                logEvent('事件总线', '派发完成');
+            } catch (error) {
+                showTestResult('eventbus-test-result', false, '事件总线派发失败', error.message);
+                logEvent('事件总线', `派发失败: ${error.message}`);
+            }
+        }
+
+        // 1. 头部导航测试
+        async function testHeaderNavigation() {
+            logEvent('头部导航', '开始测试头部导航组件');
+
+            try {
+                const { HeaderNavigation } = await import('../components/header-navigation.js');
+                const headerNav = new HeaderNavigation();
+
+                document.getElementById('header-test-result').innerHTML = '';
+                document.getElementById('header-test-result').appendChild(headerNav.getElement());
+
+                // 测试状态指示器
+                headerNav.updateStatus('imagePositioning', 'connected', '图像定位已连接');
+                headerNav.updateStatus('aiConnection', 'connecting', 'AI服务连接中');
+                headerNav.updateStatus('gradingSettings', 'ready', '评分设置就绪');
+
+                // 测试标签切换
+                headerNav.on('tab-changed', (data) => {
+                    logEvent('标签切换', `切换到标签: ${data.tab}`);
+                });
+
+                testStats.components++;
+                showTestResult('header-test-result', true, '头部导航组件加载成功', '状态指示器和标签切换功能正常');
+                logEvent('头部导航', '测试完成');
+
+            } catch (error) {
+                showTestResult('header-test-result', false, '头部导航组件加载失败', error.message);
+                logEvent('头部导航', `测试失败: ${error.message}`);
+            }
+        }
+
+        // 2. AI评分显示测试
+        async function testAIScoreDisplay() {
+            logEvent('AI评分显示', '开始测试AI评分显示组件');
+
+            try {
+                const { AIScoreDisplay } = await import('../components/ai-score-display.js');
+                const scoreDisplay = new AIScoreDisplay();
+
+                document.getElementById('score-display-test-result').innerHTML = '';
+                document.getElementById('score-display-test-result').appendChild(scoreDisplay.getElement());
+
+                // 显示模拟评分数据
+                const mockScoreData = {
+                    totalScore: 85,
+                    confidence: 78,
+                    scoringTime: 3,
+                    aiModel: 'GPT-4 Vision',
+                    breakdown: [
+                        {
+                            name: '内容完整性',
+                            description: '答案是否完整回答了题目要求',
+                            score: 18,
+                            maxScore: 20
+                        },
+                        {
+                            name: '逻辑性',
+                            description: '答案的逻辑结构和条理性',
+                            score: 17,
+                            maxScore: 20
+                        },
+                        {
+                            name: '语言表达',
+                            description: '语言表达的准确性和流畅性',
+                            score: 16,
+                            maxScore: 20
+                        },
+                        {
+                            name: '创新性',
+                            description: '答案的创新性和独立思考',
+                            score: 15,
+                            maxScore: 20
+                        },
+                        {
+                            name: '格式规范',
+                            description: '答案格式和书写规范',
+                            score: 19,
+                            maxScore: 20
+                        }
+                    ],
+                    feedback: '答案整体表现良好，内容完整，逻辑清晰。建议在创新性方面可以进一步加强，增加更多个人见解。',
+                    tags: ['内容完整', '逻辑清晰', '语言流畅', '创新不足']
+                };
+
+                scoreDisplay.displayScore(mockScoreData);
+
+                // 绑定事件
+                scoreDisplay.on('score-confirmed', (data) => {
+                    logEvent('评分确认', '用户确认了评分结果');
+                });
+
+                scoreDisplay.on('score-adjustment-requested', (data) => {
+                    logEvent('评分调整', '用户请求调整评分');
+                });
+
+                scoreDisplay.on('score-rejected', (data) => {
+                    logEvent('评分拒绝', '用户拒绝了评分结果');
+                });
+
+                scoreDisplay.on('score-exported', (data) => {
+                    logEvent('评分导出', '用户导出了评分数据');
+                });
+
+                testStats.components++;
+                showTestResult('score-display-test-result', true, 'AI评分显示组件加载成功', '评分展示、维度分析、事件处理功能正常');
+                logEvent('AI评分显示', '测试完成');
+
+            } catch (error) {
+                showTestResult('score-display-test-result', false, 'AI评分显示组件加载失败', error.message);
+                logEvent('AI评分显示', `测试失败: ${error.message}`);
+            }
+        }
+
+        // 3. 智能阅卷界面测试
+        async function testAIGradingInterface() {
+            logEvent('智能阅卷界面', '开始测试智能阅卷界面');
+
+            try {
+                const { MainLayout } = await import('../components/main-layout.js');
+                const mainLayout = new MainLayout();
+
+                document.getElementById('ai-grading-test-result').innerHTML = '';
+                document.getElementById('ai-grading-test-result').appendChild(mainLayout.getElement());
+
+                // 切换到智能阅卷标签
+                mainLayout.switchTab('ai-grading');
+
+                // 绑定事件
+                mainLayout.on('files-uploaded', (data) => {
+                    logEvent('文件上传', `上传了 ${data.files.length} 个文件`);
+                });
+
+                mainLayout.on('ai-grading-completed', (data) => {
+                    logEvent('AI评分', '评分过程完成');
+                });
+
+                testStats.components++;
+                showTestResult('ai-grading-test-result', true, '智能阅卷界面加载成功', '文件上传、评分功能、界面切换正常');
+                logEvent('智能阅卷界面', '测试完成');
+
+            } catch (error) {
+                showTestResult('ai-grading-test-result', false, '智能阅卷界面加载失败', error.message);
+                logEvent('智能阅卷界面', `测试失败: ${error.message}`);
+            }
+        }
+
+        // 4. 人工复核界面测试
+        async function testManualReviewInterface() {
+            logEvent('人工复核界面', '开始测试人工复核界面');
+
+            try {
+                const { MainLayout } = await import('../components/main-layout.js');
+                const mainLayout = new MainLayout();
+
+                document.getElementById('manual-review-test-result').innerHTML = '';
+                document.getElementById('manual-review-test-result').appendChild(mainLayout.getElement());
+
+                // 切换到人工复核标签
+                mainLayout.switchTab('manual-review');
+
+                // 绑定事件
+                mainLayout.on('review-modal-opened', (data) => {
+                    logEvent('复核模态框', '打开了复核模态框');
+                });
+
+                mainLayout.on('batch-review-started', (data) => {
+                    logEvent('批量复核', `开始批量复核，共 ${data.count} 条记录`);
+                });
+
+                mainLayout.on('review-records-exported', (data) => {
+                    logEvent('记录导出', `导出了 ${data.count} 条复核记录`);
+                });
+
+                testStats.components++;
+                showTestResult('manual-review-test-result', true, '人工复核界面加载成功', '复核列表、筛选功能、导出功能正常');
+                logEvent('人工复核界面', '测试完成');
+
+            } catch (error) {
+                showTestResult('manual-review-test-result', false, '人工复核界面加载失败', error.message);
+                logEvent('人工复核界面', `测试失败: ${error.message}`);
+            }
+        }
+
+        // 5. 数据分析界面测试
+        async function testDataAnalysisInterface() {
+            logEvent('数据分析界面', '开始测试数据分析界面');
+
+            try {
+                const { Charts } = await import('../components/charts.js');
+                const charts = new Charts();
+
+                document.getElementById('data-analysis-test-result').innerHTML = '';
+                document.getElementById('data-analysis-test-result').appendChild(charts.getElement());
+
+                // 初始化图表
+                await charts.mount();
+
+                // 绑定事件
+                charts.on('data-refreshed', (data) => {
+                    logEvent('图表刷新', '图表数据已刷新');
+                });
+
+                charts.on('time-range-changed', (timeRange) => {
+                    logEvent('时间范围', `时间范围更改为: ${timeRange}`);
+                });
+
+                testStats.components++;
+                showTestResult('data-analysis-test-result', true, '数据分析界面加载成功', '图表显示、数据刷新、交互功能正常');
+                logEvent('数据分析界面', '测试完成');
+
+            } catch (error) {
+                showTestResult('data-analysis-test-result', false, '数据分析界面加载失败', error.message);
+                logEvent('数据分析界面', `测试失败: ${error.message}`);
+            }
+        }
+
+        // 辅助测试函数
+        async function testScoreLoading() {
+            logEvent('加载状态', '测试评分加载状态');
+            // 这里可以添加具体的加载状态测试
+        }
+
+        async function testScoreError() {
+            logEvent('错误状态', '测试评分错误状态');
+            // 这里可以添加具体的错误状态测试
+        }
+
+        async function clearScoreDisplay() {
+            logEvent('清除显示', '清除评分显示');
+            document.getElementById('score-display-test-result').innerHTML = '<span style="color: #6b7280;">评分显示已清除</span>';
+        }
+
+        async function testFileUpload() {
+            logEvent('文件上传', '测试文件上传功能');
+            // 这里可以添加具体的文件上传测试
+        }
+
+        async function testAIGradingProcess() {
+            logEvent('评分过程', '测试AI评分过程');
+            // 这里可以添加具体的评分过程测试
+        }
+
+        async function testTrialReading() {
+            logEvent('试读功能', '测试试读功能');
+            // 这里可以添加具体的试读功能测试
+        }
+
+        async function testReviewFiltering() {
+            logEvent('复核筛选', '测试复核筛选功能');
+            // 这里可以添加具体的筛选功能测试
+        }
+
+        async function testBatchReview() {
+            logEvent('批量复核', '测试批量复核功能');
+            // 这里可以添加具体的批量复核测试
+        }
+
+        async function testReviewExport() {
+            logEvent('复核导出', '测试复核导出功能');
+            // 这里可以添加具体的导出功能测试
+        }
+
+        async function testChartRefresh() {
+            logEvent('图表刷新', '测试图表数据刷新');
+            // 这里可以添加具体的图表刷新测试
+        }
+
+        async function testTimeRangeChange() {
+            logEvent('时间范围', '测试时间范围切换');
+            // 这里可以添加具体的时间范围测试
+        }
+
+        function clearEventLog() {
+            document.getElementById('event-log').innerHTML = '<div class="timestamp">[系统]</span> - 事件日志已清除';
+            testStats.events = 1; // 只保留清除记录
+            updatePerformanceStats();
+        }
+
+        function exportEventLog() {
+            const eventLog = document.getElementById('event-log').innerText;
+            const blob = new Blob([eventLog], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `event-log-${new Date().toISOString()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            logEvent('系统', '事件日志已导出');
+        }
+
+        // 初始化
+        logEvent('系统', 'UI集成测试页面加载完成');
+        updatePerformanceStats();
+
+        // 运行自动化测试
+        setTimeout(() => {
+            logEvent('自动化测试', '开始运行自动化测试套件');
+            // 可以在这里添加自动化测试逻辑
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型设置功能测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        /* 模型参数滑块样式（原型设计风格） */
+        .model-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+            width: 100%;
+            height: 20px;
+        }
+
+        /* 滑块轨道 */
+        .model-slider::-webkit-slider-track {
+            background: linear-gradient(to right,
+                var(--slider-color, #3b82f6) 0%,
+                var(--slider-color, #3b82f6) var(--progress, 0%),
+                #e5e7eb var(--progress, 0%),
+                #e5e7eb 100%);
+            height: 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            transition: background 0.3s ease;
+        }
+
+        .model-slider::-moz-range-track {
+            background: linear-gradient(to right,
+                var(--slider-color, #3b82f6) 0%,
+                var(--slider-color, #3b82f6) var(--progress, 0%),
+                #e5e7eb var(--progress, 0%),
+                #e5e7eb 100%);
+            height: 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            transition: background 0.3s ease;
+        }
+
+        /* 滑块滑块 */
+        .model-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(135deg, var(--slider-color, #3b82f6) 0%, var(--slider-color-dark, #2563eb) 100%);
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            transition: all 0.15s ease;
+            margin-top: -6px;
+            cursor: pointer;
+        }
+
+        .model-slider::-webkit-slider-thumb:hover {
+            background: linear-gradient(135deg, var(--slider-color-dark, #2563eb) 0%, var(--slider-color-darker, #1d4ed8) 100%);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .model-slider::-webkit-slider-thumb:active {
+            transform: scale(0.95);
+        }
+
+        .model-slider::-moz-range-thumb {
+            background: linear-gradient(135deg, var(--slider-color, #3b82f6) 0%, var(--slider-color-dark, #2563eb) 100%);
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .model-slider::-moz-range-thumb:hover {
+            background: linear-gradient(135deg, var(--slider-color-dark, #2563eb) 0%, var(--slider-color-darker, #1d4ed8) 100%);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        /* 模型特定颜色 */
+        .model-slider[data-model="gpt4o"] {
+            --slider-color: #10b981;
+            --slider-color-dark: #059669;
+            --slider-color-darker: #047857;
+        }
+
+        .model-slider[data-model="gemini"] {
+            --slider-color: #8b5cf6;
+            --slider-color-dark: #7c3aed;
+            --slider-color-darker: #6d28d9;
+        }
+
+        .model-slider[data-model="qwen"] {
+            --slider-color: #3b82f6;
+            --slider-color-dark: #2563eb;
+            --slider-color-darker: #1d4ed8;
+        }
+
+        .model-slider[data-model="glm"] {
+            --slider-color: #f59e0b;
+            --slider-color-dark: #d97706;
+            --slider-color-darker: #b45309;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">模型设置功能测试</h1>
+
+        <!-- 设置按钮 -->
+        <button onclick="openTestSettings()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>打开设置界面</span>
+        </button>
+
+        <!-- 测试结果显示 -->
+        <div id="testResults" class="mt-6 p-4 bg-white rounded-lg border hidden">
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">测试结果</h2>
+            <div id="testOutput" class="text-sm text-gray-600"></div>
+        </div>
+    </div>
+
+    <!-- 简化的设置模态框用于测试 -->
+    <div id="testSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-[90vw] max-w-4xl mx-auto my-4 p-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">模型设置测试</h2>
+                <button onclick="closeTestSettings()" class="p-2 hover:bg-gray-100 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Tab导航 -->
+            <div class="flex space-x-2 bg-gray-100 p-1.5 rounded-xl border border-gray-200 mb-6">
+                <button onclick="switchTab('model')" class="tab-btn flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all bg-white text-blue-600 shadow-sm border border-blue-200">
+                    <i data-lucide="brain" class="w-4 h-4 inline mr-2"></i>
+                    模型设置
+                </button>
+                <button onclick="switchTab('preset')" class="tab-btn flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all text-gray-700 hover:bg-white">
+                    <i data-lucide="zap" class="w-4 h-4 inline mr-2"></i>
+                    预设配置
+                </button>
+            </div>
+
+            <!-- 模型设置内容 -->
+            <div id="modelTabContent" class="tab-content">
+                <!-- GPT-4o 参数设置 -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow mb-4">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="bot" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">GPT-4o</h3>
+                            <p class="text-sm text-gray-600">OpenAI 高精度多模态模型</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <!-- 温度参数 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                温度 (Temperature): <span class="text-green-600 font-semibold" id="gpt4o-temp-value">0.7</span>
+                            </label>
+                            <input type="range" id="gpt4o-temp" min="0" max="1" step="0.1" value="0.7" class="model-slider w-full" data-model="gpt4o" data-param="temperature">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>精确</span>
+                                <span>平衡</span>
+                                <span>创新</span>
+                            </div>
+                        </div>
+                        <!-- 最大Tokens -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">最大Tokens</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="range" id="gpt4o-max-tokens" min="512" max="4096" step="256" value="2048" class="model-slider flex-1" data-model="gpt4o" data-param="maxTokens">
+                                <span class="text-sm font-medium text-green-600 min-w-[60px]" id="gpt4o-max-tokens-value">2048</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gemini 参数设置 -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow mb-4">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="sparkles" class="w-6 h-6 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Gemini</h3>
+                            <p class="text-sm text-gray-600">Google 多模态AI模型</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <!-- 温度参数 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                温度 (Temperature): <span class="text-purple-600 font-semibold" id="gemini-temp-value">0.6</span>
+                            </label>
+                            <input type="range" id="gemini-temp" min="0" max="1" step="0.1" value="0.6" class="model-slider w-full" data-model="gemini" data-param="temperature">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>精确</span>
+                                <span>平衡</span>
+                                <span>创新</span>
+                            </div>
+                        </div>
+                        <!-- Top-K -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Top-K: <span class="text-purple-600 font-semibold" id="gemini-topk-value">40</span>
+                            </label>
+                            <input type="range" id="gemini-topk" min="1" max="100" step="1" value="40" class="model-slider w-full" data-model="gemini" data-param="topK">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 预设配置内容 -->
+            <div id="presetTabContent" class="tab-content hidden">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h4 class="text-sm font-medium text-blue-900 mb-3 flex items-center">
+                        <i data-lucide="zap" class="w-4 h-4 mr-2"></i>
+                        快速预设配置
+                    </h4>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="applyPreset('speed')" class="p-3 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors flex items-center justify-center space-x-2">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            <span>速度优先</span>
+                        </button>
+                        <button onclick="applyPreset('balance')" class="p-3 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors flex items-center justify-center space-x-2">
+                            <i data-lucide="scale" class="w-4 h-4"></i>
+                            <span>均衡模式</span>
+                        </button>
+                        <button onclick="applyPreset('accuracy')" class="p-3 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors flex items-center justify-center space-x-2">
+                            <i data-lucide="target" class="w-4 h-4"></i>
+                            <span>准确优先</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="flex justify-end space-x-2 mt-6">
+                <button onclick="testSaveSettings()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
+                    测试保存
+                </button>
+                <button onclick="closeTestSettings()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟toast通知
+        function showToast(type, title, message) {
+            console.log(`[${type}] ${title}: ${message}`);
+            document.getElementById('testResults').classList.remove('hidden');
+            document.getElementById('testOutput').innerHTML += `<p><strong>${title}</strong>: ${message}</p>`;
+        }
+
+        function openTestSettings() {
+            document.getElementById('testSettingsModal').classList.remove('hidden');
+            initializeTestSliders();
+            lucide.createIcons();
+        }
+
+        function closeTestSettings() {
+            document.getElementById('testSettingsModal').classList.add('hidden');
+        }
+
+        function switchTab(tab) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm', 'border-blue-200');
+                btn.classList.add('text-gray-700');
+            });
+
+            contents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            if (tab === 'model') {
+                buttons[0].classList.add('bg-white', 'text-blue-600', 'shadow-sm', 'border-blue-200');
+                buttons[0].classList.remove('text-gray-700');
+                document.getElementById('modelTabContent').classList.remove('hidden');
+            } else {
+                buttons[1].classList.add('bg-white', 'text-blue-600', 'shadow-sm', 'border-blue-200');
+                buttons[1].classList.remove('text-gray-700');
+                document.getElementById('presetTabContent').classList.remove('hidden');
+            }
+        }
+
+        function initializeTestSliders() {
+            const sliders = document.querySelectorAll('.model-slider');
+            sliders.forEach(slider => {
+                updateSliderProgress(slider);
+                slider.addEventListener('input', (e) => {
+                    updateSliderProgress(e.target);
+                    updateParameterDisplay(e.target);
+                });
+            });
+        }
+
+        function updateSliderProgress(slider) {
+            const value = parseFloat(slider.value);
+            const min = parseFloat(slider.min) || 0;
+            const max = parseFloat(slider.max) || 1;
+            const percentage = ((value - min) / (max - min)) * 100;
+            slider.style.setProperty('--progress', percentage + '%');
+        }
+
+        function updateParameterDisplay(slider) {
+            const value = slider.value;
+            const displayElement = document.getElementById(`${slider.id}-value`);
+            if (displayElement) {
+                displayElement.textContent = value;
+            }
+        }
+
+        const presetConfigs = {
+            speed: {
+                gpt4o: { temperature: 0.3, maxTokens: 1024, topP: 0.7 },
+                gemini: { temperature: 0.2, maxTokens: 1024, topK: 20 }
+            },
+            balance: {
+                gpt4o: { temperature: 0.7, maxTokens: 2048, topP: 0.9 },
+                gemini: { temperature: 0.6, maxTokens: 2048, topK: 40 }
+            },
+            accuracy: {
+                gpt4o: { temperature: 0.2, maxTokens: 4096, topP: 0.95 },
+                gemini: { temperature: 0.1, maxTokens: 4096, topK: 10 }
+            }
+        };
+
+        function applyPreset(preset) {
+            const config = presetConfigs[preset];
+            if (!config) return;
+
+            // 应用GPT-4o配置
+            if (config.gpt4o) {
+                document.getElementById('gpt4o-temp').value = config.gpt4o.temperature;
+                document.getElementById('gpt4o-max-tokens').value = config.gpt4o.maxTokens;
+                updateSliderProgress(document.getElementById('gpt4o-temp'));
+                updateSliderProgress(document.getElementById('gpt4o-max-tokens'));
+                updateParameterDisplay(document.getElementById('gpt4o-temp'));
+                updateParameterDisplay(document.getElementById('gpt4o-max-tokens'));
+            }
+
+            // 应用Gemini配置
+            if (config.gemini) {
+                document.getElementById('gemini-temp').value = config.gemini.temperature;
+                document.getElementById('gemini-topk').value = config.gemini.topK;
+                updateSliderProgress(document.getElementById('gemini-temp'));
+                updateSliderProgress(document.getElementById('gemini-topk'));
+                updateParameterDisplay(document.getElementById('gemini-temp'));
+                updateParameterDisplay(document.getElementById('gemini-topk'));
+            }
+
+            const presetNames = {
+                speed: '速度优先',
+                balance: '均衡模式',
+                accuracy: '准确优先'
+            };
+
+            showToast('success', '预设应用成功', `${presetNames[preset]}配置已应用到所有模型`);
+        }
+
+        function testSaveSettings() {
+            const settings = {
+                gpt4o: {
+                    temperature: document.getElementById('gpt4o-temp').value,
+                    maxTokens: document.getElementById('gpt4o-max-tokens').value
+                },
+                gemini: {
+                    temperature: document.getElementById('gemini-temp').value,
+                    topK: document.getElementById('gemini-topk').value
+                }
+            };
+
+            console.log('保存的设置:', settings);
+            showToast('success', '设置已保存', JSON.stringify(settings, null, 2));
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

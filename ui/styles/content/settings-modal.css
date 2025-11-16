@@ -1,0 +1,6 @@
+.zhixue-ai-settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); }
+.zhixue-ai-settings-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 600px; background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden; }
+.zhixue-ai-settings-header { display:flex; align-items:center; justify-content:space-between; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+.zhixue-ai-settings-body { padding: 16px 20px; }
+.zhixue-ai-settings-footer { display:flex; justify-content:flex-end; gap:12px; padding: 16px 20px; border-top: 1px solid var(--border-color); background:#f8fafc; }
+.settings-close-btn { background:none; border:none; font-size:24px; color:#64748b; cursor:pointer; }

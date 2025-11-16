@@ -1,0 +1,4 @@
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px);} to { opacity:1; transform: translateY(0);} }
+@keyframes spin { to { transform: rotate(360deg);} }
+.slide-in { animation: slideIn .3s ease-out; }
+.loading-spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation: spin .8s linear infinite; display:inline-block; }

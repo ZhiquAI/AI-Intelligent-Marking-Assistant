@@ -1,0 +1,513 @@
+/* ============================================================================
+   智学网AI智能阅卷助手 - 主样式文件
+   100%还原原HTML中的所有样式
+   ============================================================================ */
+
+/* 引入Google Fonts - Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ========== CSS 变量 - 极简配色方案 ========== */
+:root {
+    /* Minimalist Color Palette */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --accent-blue: #3b82f6;
+    --accent-blue-light: #dbeafe;
+    --accent-green: #10b981;
+    --accent-green-light: #d1fae5;
+    --accent-purple: #8b5cf6;
+    --accent-purple-light: #ede9fe;
+    --accent-orange: #f59e0b;
+    --accent-orange-light: #fef3c7;
+}
+
+/* ========== 全局样式 ========== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    min-height: 100vh;
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+}
+
+/* ========== 焦点样式 - 提升可访问性 ========== */
+button:focus,
+[role="button"]:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* ========== 图标样式 ========== */
+[data-lucide] {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: inline-block;
+}
+
+/* ========== 动画定义 ========== */
+@keyframes slide-in {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scale-in {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========== 动画类 ========== */
+.slide-in {
+    animation: slide-in 0.3s ease-out;
+}
+
+.fade-in {
+    animation: fade-in 0.2s ease-out;
+}
+
+.scale-in {
+    animation: scale-in 0.2s ease-out;
+}
+
+.loading {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* ========== 卡片样式 ========== */
+.card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* ========== Tab 样式 ========== */
+.tab-indicator {
+    transition: left 0.2s ease;
+}
+
+.tab-button {
+    position: relative;
+    z-index: 10;
+    outline: none;
+}
+
+.tab-button:focus {
+    ring: 2px;
+    ring-color: rgb(59 130 246 / 0.5);
+    ring-offset: 2px;
+}
+
+.tab-content {
+    display: block;
+}
+
+.tab-content.hidden {
+    display: none !important;
+}
+
+/* ========== 进度条样式 ========== */
+.progress-fill {
+    transition: width 0.3s ease;
+}
+
+.progress-bar {
+    transition: width 0.5s ease;
+}
+
+/* ========== 按钮样式 ========== */
+.btn {
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+/* ========== 自定义滚动条 ========== */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* ========== 自定义范围滑块 ========== */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 100%;
+    height: 20px;
+}
+
+/* Slider Track - Webkit */
+input[type="range"]::-webkit-slider-track {
+    background: linear-gradient(to right,
+        var(--slider-color, #3b82f6) 0%,
+        var(--slider-color, #3b82f6) var(--progress, 0%),
+        #e5e7eb var(--progress, 0%),
+        #e5e7eb 100%);
+    height: 8px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    transition: background 0.3s ease;
+}
+
+/* Slider Track - Mozilla */
+input[type="range"]::-moz-range-track {
+    background: linear-gradient(to right,
+        var(--slider-color, #3b82f6) 0%,
+        var(--slider-color, #3b82f6) var(--progress, 0%),
+        #e5e7eb var(--progress, 0%),
+        #e5e7eb 100%);
+    height: 8px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    transition: background 0.3s ease;
+}
+
+/* Slider Thumb - Webkit */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    transition: all 0.15s ease;
+    margin-top: -6px;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(0.95);
+}
+
+/* Slider Thumb - Mozilla */
+input[type="range"]::-moz-range-thumb {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Progress fill for range input */
+input[type="range"]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #3b82f6 0%, #3b82f6 var(--value, 0%), #e5e7eb var(--value, 0%), #e5e7eb 100%);
+}
+
+/* Focus State */
+input[type="range"]:focus {
+    outline: none;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+input[type="range"]:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* ========== 文件拖放区域 ========== */
+.file-drop-zone {
+    border: 2px dashed var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.file-drop-zone.dragover {
+    border-color: var(--accent-blue);
+    background: var(--accent-blue-light);
+}
+
+/* ========== 模板预览样式 ========== */
+.template-preview {
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+/* ========== 标签样式 ========== */
+.tag {
+    transition: all 0.2s ease;
+}
+
+.tag:hover {
+    transform: scale(1.05);
+}
+
+/* ========== 主题切换动画 ========== */
+.theme-transition {
+    transition: all 0.3s ease;
+}
+
+/* ========== 暗黑模式样式 ========== */
+.dark-mode {
+    background: linear-gradient(135deg, #1a1c2e 0%, #2d3561 100%);
+}
+
+.dark-mode .glass {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .text-gray-800 {
+    color: #e5e7eb;
+}
+
+.dark-mode .text-gray-600 {
+    color: #9ca3af;
+}
+
+.dark-mode .text-gray-700 {
+    color: #d1d5db;
+}
+
+.dark-mode .bg-white {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .border-gray-200 {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .file-drop-zone {
+    border-color: rgba(230, 126, 34, 0.3);
+}
+
+.dark-mode .file-drop-zone.dragover {
+    border-color: rgba(230, 126, 34, 0.8);
+    background: rgba(230, 126, 34, 0.1);
+}
+
+/* ========== 样题试阅模块样式 ========== */
+.sample-exam-card {
+    transition: all 0.3s ease;
+}
+
+.sample-exam-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(230, 126, 34, 0.15);
+}
+
+.dual-model-card {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.score-highlight {
+    background: linear-gradient(135deg, #E67E22 0%, #D66545 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ========== 人工复核模块样式 ========== */
+.kbd {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-family: monospace;
+}
+
+/* ========== 模态框样式 ========== */
+.modal-backdrop {
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    transition: all 0.3s ease;
+}
+
+/* ========== Toast 通知样式 ========== */
+.toast {
+    animation: slide-in 0.3s ease-out;
+}
+
+.toast.hide {
+    animation: fade-out 0.3s ease-in;
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* ========== 实用工具类 ========== */
+.hidden {
+    display: none !important;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.select-none {
+    user-select: none;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-move {
+    cursor: move;
+}
+
+/* ========== Chrome 扩展 Popup 特定样式 ========== */
+html.zhixue-ai-popup,
+body.zhixue-ai-popup {
+    width: 400px;
+    min-height: 500px;
+    margin: 0;
+    padding: 0;
+}
+
+.zhixue-ai-popup .popup-container {
+    width: 100%;
+    min-height: 500px;
+    background: var(--bg-primary);
+}
+
+.zhixue-ai-popup .popup-header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.zhixue-ai-popup .popup-body {
+    padding: 16px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.zhixue-ai-popup .popup-footer {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    padding: 12px 16px;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
+
+/* ========== 响应式设计增强 ========== */
+@media (max-width: 640px) {
+    .tab-button span {
+        display: none;
+    }
+
+    .card {
+        border-radius: 8px;
+    }
+}
+
+/* ========== 无障碍访问增强 ========== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #000000;
+        --text-secondary: #000000;
+    }
+}

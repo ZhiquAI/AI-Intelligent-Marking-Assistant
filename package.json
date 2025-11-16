@@ -1,0 +1,17 @@
+{
+  "name": "ai-grading-extension",
+  "private": true,
+  "version": "5.0.0",
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "rollup": "^4.24.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "rimraf": "^5.0.7"
+  }
+}
