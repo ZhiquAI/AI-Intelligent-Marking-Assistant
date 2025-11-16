@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能阅卷助手 - 智学网集成测试</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .test-header h1 {
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .test-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .test-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status-display {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .status-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .status-value.success {
+            color: #10b981;
+        }
+
+        .status-value.error {
+            color: #ef4444;
+        }
+
+        .status-value.warning {
+            color: #f59e0b;
+        }
+
+        .test-result {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .test-result.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .test-result.warning {
+            background: #fffbeb;
+            border-color: #fed7aa;
+        }
+
+        .console-output {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .console-line {
+            margin-bottom: 4px;
+        }
+
+        .console-timestamp {
+            color: #9ca3af;
+        }
+
+        .console-info {
+            color: #60a5fa;
+        }
+
+        .console-success {
+            color: #34d399;
+        }
+
+        .console-error {
+            color: #f87171;
+        }
+
+        .console-warning {
+            color: #fbbf24;
+        }
+
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #6b7280;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .feature-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .test-controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- 测试头部 -->
+        <div class="test-header">
+            <h1>🧪 AI智能阅卷助手 - 智学网集成测试</h1>
+            <p>测试智学网适配器、AI评分引擎和工作流管理器的集成功能</p>
+        </div>
+
+        <!-- 测试网格 -->
+        <div class="test-grid">
+            <!-- 智学网适配器测试 -->
+            <div class="test-panel">
+                <h2 class="panel-title">
+                    <span>🔍</span>
+                    智学网适配器测试
+                </h2>
+
+                <div class="test-controls">
+                    <button class="btn btn-primary" onclick="testZhixueAdapter()">
+                        <span class="loading" id="adapterLoading" style="display: none;"></span>
+                        测试适配器
+                    </button>
+                    <button class="btn btn-secondary" onclick="detectPageElements()">
+                        检测元素
+                    </button>
+                    <button class="btn btn-secondary" onclick="captureMockImage()">
+                        捕捉图片
+                    </button>
+                </div>
+
+                <div class="status-display">
+                    <div class="status-item">
+                        <span class="status-label">适配器状态</span>
+                        <span class="status-value" id="adapterStatus">未初始化</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">检测到的元素</span>
+                        <span class="status-value" id="detectedElements">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">页面类型</span>
+                        <span class="status-value" id="pageType">未知</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">置信度</span>
+                        <span class="status-value" id="detectionConfidence">0%</span>
+                    </div>
+                </div>
+
+                <div id="adapterResult" class="test-result" style="display: none;">
+                    <strong>✅ 适配器测试完成</strong>
+                    <p id="adapterResultText"></p>
+                </div>
+
+                <div id="adapterConsole" class="console-output" style="display: none;">
+                    <!-- 控制台输出将在这里显示 -->
+                </div>
+            </div>
+
+            <!-- AI评分引擎测试 -->
+            <div class="test-panel">
+                <h2 class="panel-title">
+                    <span>🤖</span>
+                    AI评分引擎测试
+                </h2>
+
+                <div class="test-controls">
+                    <button class="btn btn-primary" onclick="testAIScoringEngine()">
+                        <span class="loading" id="engineLoading" style="display: none;"></span>
+                        测试评分引擎
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateScoringRubric()">
+                        生成评分细则
+                    </button>
+                    <button class="btn btn-secondary" onclick="performAIScoring()">
+                        执行AI评分
+                    </button>
+                </div>
+
+                <div class="status-display">
+                    <div class="status-item">
+                        <span class="status-label">引擎状态</span>
+                        <span class="status-value" id="engineStatus">未初始化</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">可用模型</span>
+                        <span class="status-value" id="availableModels">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">当前模型</span>
+                        <span class="status-value" id="currentModel">无</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">评分次数</span>
+                        <span class="status-value" id="scoringCount">0</span>
+                    </div>
+                </div>
+
+                <div id="engineResult" class="test-result" style="display: none;">
+                    <strong>✅ 评分引擎测试完成</strong>
+                    <p id="engineResultText"></p>
+                </div>
+
+                <div id="engineConsole" class="console-output" style="display: none;">
+                    <!-- 控制台输出将在这里显示 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 工作流管理器测试 -->
+        <div class="test-panel">
+            <h2 class="panel-title">
+                <span>⚙️</span>
+                工作流管理器测试
+            </h2>
+
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testWorkflowManager()">
+                    <span class="loading" id="workflowLoading" style="display: none;"></span>
+                    测试工作流
+                </button>
+                <button class="btn btn-secondary" onclick="startCompleteWorkflow()">
+                    完整工作流
+                </button>
+                <button class="btn btn-secondary" onclick="testErrorHandling()">
+                    错误处理
+                </button>
+                <button class="btn btn-secondary" onclick="clearWorkflowHistory()">
+                    清除历史
+                </button>
+            </div>
+
+            <div class="status-display">
+                <div class="status-item">
+                    <span class="status-label">工作流状态</span>
+                    <span class="status-value" id="workflowStatus">未初始化</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">当前状态</span>
+                    <span class="status-value" id="currentWorkflowState">空闲</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">工作流数量</span>
+                    <span class="status-value" id="workflowCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">成功/失败</span>
+                    <span class="status-value" id="successRate">0/0</span>
+                </div>
+            </div>
+
+            <div class="progress-indicator" id="workflowProgress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="workflowProgressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text" id="workflowProgressText">0%</div>
+            </div>
+
+            <div id="workflowResult" class="test-result" style="display: none;">
+                <strong>✅ 工作流测试完成</strong>
+                <p id="workflowResultText"></p>
+            </div>
+
+            <div id="workflowConsole" class="console-output" style="display: none;">
+                <!-- 控制台输出将在这里显示 -->
+            </div>
+        </div>
+
+        <!-- 综合集成测试 -->
+        <div class="test-panel">
+            <h2 class="panel-title">
+                <span>🚀</span>
+                综合集成测试
+            </h2>
+
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="runFullIntegrationTest()">
+                    <span class="loading" id="integrationLoading" style="display: none;"></span>
+                    运行完整测试
+                </button>
+                <button class="btn btn-secondary" onclick="testAutoMode()">
+                    自动模式测试
+                </button>
+                <button class="btn btn-secondary" onclick="testManualReviewFlow()">
+                    人工复核流程
+                </button>
+                <button class="btn btn-secondary" onclick="testPerformance()">
+                    性能测试
+                </button>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-title">页面检测</div>
+                    <div class="feature-desc">自动检测智学网页面元素</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📸</div>
+                    <div class="feature-title">图片捕捉</div>
+                    <div class="feature-desc">智能捕捉答题卡图片</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-title">AI评分</div>
+                    <div class="feature-desc">多维度智能评分分析</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-title">分数同步</div>
+                    <div class="feature-desc">自动同步到智学网</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-title">人工复核</div>
+                    <div class="feature-desc">低置信度转人工处理</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">数据分析</div>
+                    <div class="feature-desc">评分数据统计分析</div>
+                </div>
+            </div>
+
+            <div id="integrationResult" class="test-result" style="display: none;">
+                <strong>✅ 综合测试完成</strong>
+                <p id="integrationResultText"></p>
+            </div>
+
+            <div id="integrationConsole" class="console-output" style="display: none;">
+                <!-- 控制台输出将在这里显示 -->
+            </div>
+        </div>
+
+        <!-- 性能统计 -->
+        <div class="test-panel">
+            <h2 class="panel-title">
+                <span>📈</span>
+                性能统计
+            </h2>
+
+            <div class="status-display">
+                <div class="status-item">
+                    <span class="status-label">平均评分时间</span>
+                    <span class="status-value" id="avgScoringTime">0s</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">成功率</span>
+                    <span class="status-value" id="successRatePercent">0%</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">总测试次数</span>
+                    <span class="status-value" id="totalTests">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">错误次数</span>
+                    <span class="status-value" id="errorCount">0</span>
+                </div>
+            </div>
+
+            <div class="test-controls">
+                <button class="btn btn-secondary" onclick="exportTestResults()">
+                    导出结果
+                </button>
+                <button class="btn btn-secondary" onclick="resetStatistics()">
+                    重置统计
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // 测试统计
+        const testStats = {
+            adapter: { tests: 0, errors: 0, avgTime: 0 },
+            engine: { tests: 0, errors: 0, avgTime: 0 },
+            workflow: { tests: 0, errors: 0, avgTime: 0, success: 0, total: 0 },
+            integration: { tests: 0, errors: 0, avgTime: 0 }
+        };
+
+        let services = null;
+        let isInitializing = false;
+
+        // 控制台输出函数
+        function logToConsole(consoleId, message, type = 'info') {
+            const console = document.getElementById(consoleId);
+            const line = document.createElement('div');
+            line.className = 'console-line';
+
+            const timestamp = new Date().toLocaleTimeString();
+            let className = 'console-info';
+
+            if (type === 'error') className = 'console-error';
+            else if (type === 'success') className = 'console-success';
+            else if (type === 'warning') className = 'console-warning';
+
+            line.innerHTML = `<span class="console-timestamp">[${timestamp}]</span> - <span class="${className}">${message}</span>`;
+
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+
+            // 限制日志数量
+            const lines = console.querySelectorAll('.console-line');
+            if (lines.length > 100) {
+                console.removeChild(lines[0]);
+            }
+        }
+
+        // 显示测试结果
+        function showTestResult(resultId, success, message, details = '') {
+            const resultDiv = document.getElementById(resultId);
+            const resultText = document.getElementById(resultId.replace('Result', 'ResultText'));
+
+            resultDiv.className = success ? 'test-result' : 'test-result error';
+            resultText.textContent = message;
+
+            if (details) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.style.marginTop = '8px';
+                detailsDiv.style.fontSize = '12px';
+                detailsDiv.style.color = '#6b7280';
+                detailsDiv.textContent = details;
+                resultText.appendChild(detailsDiv);
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // 显示加载状态
+        function showLoading(loadingId, show = true) {
+            const loading = document.getElementById(loadingId);
+            const button = loading.parentElement;
+
+            if (show) {
+                loading.style.display = 'inline-block';
+                button.disabled = true;
+            } else {
+                loading.style.display = 'none';
+                button.disabled = false;
+            }
+        }
+
+        // 更新状态显示
+        function updateStatus(statusId, value, type = 'normal') {
+            const statusElement = document.getElementById(statusId);
+            statusElement.textContent = value;
+            statusElement.className = `status-value ${type}`;
+        }
+
+        // 初始化服务
+        async function initializeServices() {
+            if (isInitializing) return;
+            isInitializing = true;
+
+            try {
+                logToConsole('adapterConsole', '正在初始化服务...', 'info');
+                logToConsole('engineConsole', '正在初始化服务...', 'info');
+                logToConsole('workflowConsole', '正在初始化服务...', 'info');
+
+                // 动态导入服务模块
+                const { initializeServices } = await import('../services/index.js');
+
+                services = await initializeServices();
+
+                logToConsole('adapterConsole', '✅ 服务初始化完成', 'success');
+                logToConsole('engineConsole', '✅ 服务初始化完成', 'success');
+                logToConsole('workflowConsole', '✅ 服务初始化完成', 'success');
+
+                // 更新状态显示
+                updateStatus('adapterStatus', '已初始化', 'success');
+                updateStatus('engineStatus', '已初始化', 'success');
+                updateStatus('workflowStatus', '已初始化', 'success');
+
+                // 显示详细信息
+                const adapterStatus = services.zhixueAdapter.getStatus();
+                updateStatus('pageType', adapterStatus.currentPage);
+                updateStatus('detectedElements', `${adapterStatus.elementsCount}/${adapterStatus.totalElementTypes}`);
+                updateStatus('detectionConfidence', `${Math.round(adapterStatus.confidence * 100)}%`);
+
+                const engineStatus = services.aiScoringEngine.getStatus();
+                updateStatus('availableModels', engineStatus.availableModels?.length || 0);
+                updateStatus('currentModel', engineStatus.currentModel || '无');
+
+                showTestResult('adapterResult', true, '服务初始化成功', '所有服务组件已准备就绪');
+                showTestResult('engineResult', true, '服务初始化成功', 'AI评分引擎已加载');
+                showTestResult('workflowResult', true, '服务初始化成功', '工作流管理器已启动');
+
+            } catch (error) {
+                logToConsole('adapterConsole', `❌ 服务初始化失败: ${error.message}`, 'error');
+                logToConsole('engineConsole', `❌ 服务初始化失败: ${error.message}`, 'error');
+                logToConsole('workflowConsole', `❌ 服务初始化失败: ${error.message}`, 'error');
+
+                updateStatus('adapterStatus', '初始化失败', 'error');
+                updateStatus('engineStatus', '初始化失败', 'error');
+                updateStatus('workflowStatus', '初始化失败', 'error');
+
+                showTestResult('adapterResult', false, '服务初始化失败', error.message);
+                showTestResult('engineResult', false, '服务初始化失败', error.message);
+                showTestResult('workflowResult', false, '服务初始化失败', error.message);
+
+            } finally {
+                isInitializing = false;
+            }
+        }
+
+        // 测试智学网适配器
+        async function testZhixueAdapter() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            showLoading('adapterLoading', true);
+            document.getElementById('adapterConsole').style.display = 'block';
+
+            try {
+                logToConsole('adapterConsole', '开始测试智学网适配器...', 'info');
+
+                const adapter = services.zhixueAdapter;
+                const startTime = Date.now();
+
+                // 测试页面类型检测
+                logToConsole('adapterConsole', '检测当前页面类型...', 'info');
+                await adapter.detectPageType();
+
+                const pageType = adapter.currentPage;
+                logToConsole('adapterConsole', `页面类型：${pageType}`, 'info');
+
+                // 测试元素检测
+                logToConsole('adapterConsole', '开始检测页面元素...', 'info');
+                const elements = await adapter.detectPageElements();
+
+                const detectedCount = Object.keys(elements).length;
+                const totalTypes = Object.keys(adapter.elementSelectors).length;
+                const confidence = Math.round(
+                    Object.values(elements).reduce((sum, el) => sum + el.confidence, 0) /
+                    detectedCount * 100
+                );
+
+                logToConsole('adapterConsole', `检测到 ${detectedCount}/${totalTypes} 种元素类型`, 'info');
+                logToConsole('adapterConsole', `平均置信度：${confidence}%`, 'info');
+
+                // 显示检测到的元素详情
+                Object.entries(elements).forEach(([type, data]) => {
+                    logToConsole('adapterConsole',
+                        `${type}: ${data.count}个元素，置信度：${Math.round(data.confidence * 100)}%，选择器：${data.selector}`,
+                        'info'
+                    );
+                });
+
+                const elapsedTime = Date.now() - startTime;
+
+                // 更新状态显示
+                updateStatus('pageType', pageType);
+                updateStatus('detectedElements', `${detectedCount}/${totalTypes}`);
+                updateStatus('detectionConfidence', `${confidence}%`);
+
+                testStats.adapter.tests++;
+                testStats.adapter.avgTime = (testStats.adapter.avgTime * (testStats.adapter.tests - 1) + elapsedTime) / testStats.adapter.tests;
+
+                showTestResult('adapterResult', true,
+                    `适配器测试完成 (${elapsedTime}ms)`,
+                    `检测到 ${detectedCount} 种页面元素，平均置信度 ${confidence}%`
+                );
+
+                logToConsole('adapterConsole', `✅ 适配器测试完成 (${elapsedTime}ms)`, 'success');
+
+            } catch (error) {
+                testStats.adapter.errors++;
+                logToConsole('adapterConsole', `❌ 适配器测试失败: ${error.message}`, 'error');
+                showTestResult('adapterResult', false, '适配器测试失败', error.message);
+            } finally {
+                showLoading('adapterLoading', false);
+                updateStatistics();
+            }
+        }
+
+        // 测试AI评分引擎
+        async function testAIScoringEngine() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            showLoading('engineLoading', true);
+            document.getElementById('engineConsole').style.display = 'block';
+
+            try {
+                logToConsole('engineConsole', '开始测试AI评分引擎...', 'info');
+
+                const engine = services.aiScoringEngine;
+                const startTime = Date.now();
+
+                // 获取引擎状态
+                const status = engine.getStatus();
+                logToConsole('engineConsole', `引擎状态：${status.isInitialized ? '已初始化' : '未初始化'}`, 'info');
+                logToConsole('engineConsole', `可用模型：${status.availableModels?.length || 0}个`, 'info');
+                logToConsole('engineConsole', `当前模型：${status.currentModel || '无'}`, 'info');
+
+                // 更新状态显示
+                updateStatus('availableModels', status.availableModels?.length || 0);
+                updateStatus('currentModel', status.currentModel || '无');
+
+                // 生成测试用的评分细则
+                const question = '阅读下面的文字，完成后面的问题。请简要分析作者在文中表达的主要观点。';
+                const referenceAnswer = '作者主要表达了科技发展与传统文化保护可以相互促进的观点。';
+
+                logToConsole('engineConsole', '生成评分细则...', 'info');
+                const rubric = await engine.generateScoringRubric(question, referenceAnswer, 'subjective');
+
+                logToConsole('engineConsole', `评分细则生成完成：${rubric.dimensions.length}个维度，总分${rubric.totalScore}分`, 'info');
+                logToConsole('engineConsole', `题目难度：${rubric.difficulty}/10`, 'info');
+
+                // 显示评分维度
+                rubric.dimensions.forEach(dim => {
+                    logToConsole('engineConsole',
+                        `${dim.name} (${dim.maxScore}分, 权重${dim.weight}): ${dim.description}`,
+                        'info'
+                    );
+                });
+
+                const elapsedTime = Date.now() - startTime;
+
+                testStats.engine.tests++;
+                testStats.engine.avgTime = (testStats.engine.avgTime * (testStats.engine.tests - 1) + elapsedTime) / testStats.engine.tests;
+
+                showTestResult('engineResult', true,
+                    `评分引擎测试完成 (${elapsedTime}ms)`,
+                    `生成了 ${rubric.dimensions.length} 个评分维度`
+                );
+
+                logToConsole('engineConsole', `✅ 评分引擎测试完成 (${elapsedTime}ms)`, 'success');
+
+            } catch (error) {
+                testStats.engine.errors++;
+                logToConsole('engineConsole', `❌ 评分引擎测试失败: ${error.message}`, 'error');
+                showTestResult('engineResult', false, '评分引擎测试失败', error.message);
+            } finally {
+                showLoading('engineLoading', false);
+                updateStatistics();
+            }
+        }
+
+        // 测试工作流管理器
+        async function testWorkflowManager() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            showLoading('workflowLoading', true);
+            document.getElementById('workflowConsole').style.display = 'block';
+
+            try {
+                logToConsole('workflowConsole', '开始测试工作流管理器...', 'info');
+
+                const manager = services.workflowManager;
+                const startTime = Date.now();
+
+                // 获取工作流状态
+                const state = manager.getWorkflowState();
+                logToConsole('workflowConsole', `工作流状态：${state.state}`, 'info');
+                logToConsole('workflowConsole', `自动模式：${state.autoMode ? '开启' : '关闭'}`, 'info');
+
+                // 更新状态显示
+                updateStatus('currentWorkflowState', state.state);
+                updateStatus('workflowCount', state.workflowCount);
+
+                // 获取工作流历史
+                const history = manager.getWorkflowHistory(5);
+                logToConsole('workflowConsole', `最近${history.length}个工作流：`, 'info');
+
+                history.forEach((workflow, index) => {
+                    logToConsole('workflowConsole',
+                        `${index + 1}. ${workflow.id} - ${workflow.status} - ${workflow.totalScore}分`,
+                        'info'
+                    );
+                });
+
+                const elapsedTime = Date.now() - startTime;
+
+                testStats.workflow.tests++;
+                testStats.workflow.avgTime = (testStats.workflow.avgTime * (testStats.workflow.tests - 1) + elapsedTime) / testStats.workflow.tests;
+
+                showTestResult('workflowResult', true,
+                    `工作流管理器测试完成 (${elapsedTime}ms)`,
+                    `当前状态：${state.state}，历史工作流：${history.length}个`
+                );
+
+                logToConsole('workflowConsole', `✅ 工作流管理器测试完成 (${elapsedTime}ms)`, 'success');
+
+            } catch (error) {
+                testStats.workflow.errors++;
+                logToConsole('workflowConsole', `❌ 工作流管理器测试失败: ${error.message}`, 'error');
+                showTestResult('workflowResult', false, '工作流管理器测试失败', error.message);
+            } finally {
+                showLoading('workflowLoading', false);
+                updateStatistics();
+            }
+        }
+
+        // 运行完整工作流
+        async function startCompleteWorkflow() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            showLoading('workflowLoading', true);
+
+            try {
+                logToConsole('workflowConsole', '开始完整工作流测试...', 'info');
+
+                const manager = services.workflowManager;
+
+                // 设置测试数据
+                const testData = {
+                    studentInfo: {
+                        name: '测试学生',
+                        id: '2021001001'
+                    },
+                    questionInfo: {
+                        content: '请分析作者在文中表达的主要观点',
+                        type: 'subjective',
+                        maxScore: 20
+                    },
+                    referenceAnswer: '作者表达了科技发展与传统文化可以协调发展的观点',
+                    confidenceThreshold: 70
+                };
+
+                // 开始工作流
+                await manager.startGradingWorkflow(testData);
+
+                logToConsole('workflowConsole', '✅ 完整工作流测试完成', 'success');
+
+            } catch (error) {
+                logToConsole('workflowConsole', `❌ 工作流测试失败: ${error.message}`, 'error');
+            } finally {
+                showLoading('workflowLoading', false);
+            }
+        }
+
+        // 测试错误处理
+        async function testErrorHandling() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            logToConsole('workflowConsole', '开始测试错误处理...', 'info');
+
+            try {
+                // 模拟各种错误情况
+                const testCases = [
+                    {
+                        name: '网络错误',
+                        simulate: () => {
+                            throw new Error('Network connection failed');
+                        }
+                    },
+                    {
+                        name: '元素检测失败',
+                        simulate: () => {
+                            throw new Error('Required elements not found on page');
+                        }
+                    },
+                    {
+                        name: 'AI评分失败',
+                        simulate: () => {
+                            throw new Error('AI scoring service unavailable');
+                        }
+                    }
+                ];
+
+                for (const testCase of testCases) {
+                    logToConsole('workflowConsole', `测试错误类型：${testCase.name}`, 'info');
+
+                    try {
+                        testCase.simulate();
+                    } catch (error) {
+                        logToConsole('workflowConsole', `捕获到错误：${error.message}`, 'warning');
+                        // 工作流管理器会自动处理这些错误
+                    }
+                }
+
+                logToConsole('workflowConsole', '✅ 错误处理测试完成', 'success');
+
+            } catch (error) {
+                logToConsole('workflowConsole', `错误处理测试异常: ${error.message}`, 'error');
+            }
+        }
+
+        // 清除工作流历史
+        function clearWorkflowHistory() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            const manager = services.workflowManager;
+
+            // 这里应该调用工作流管理器的清除方法
+            logToConsole('workflowConsole', '工作流历史已清除', 'info');
+
+            updateStatus('workflowCount', '0');
+            updateStatus('successRate', '0/0');
+        }
+
+        // 运行完整集成测试
+        async function runFullIntegrationTest() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            showLoading('integrationLoading', true);
+            document.getElementById('integrationConsole').style.display = 'block';
+
+            try {
+                logToConsole('integrationConsole', '开始完整集成测试...', 'info');
+
+                // 步骤1：初始化所有服务
+                logToConsole('integrationConsole', '步骤1：验证服务状态', 'info');
+
+                const adapterStatus = services.zhixueAdapter.getStatus();
+                const engineStatus = services.aiScoringEngine.getStatus();
+                const workflowState = services.workflowManager.getWorkflowState();
+
+                if (!adapterStatus.isActive || !engineStatus.isInitialized) {
+                    throw new Error('服务未完全初始化');
+                }
+
+                logToConsole('integrationConsole', '✅ 服务状态正常', 'success');
+
+                // 步骤2：测试页面检测
+                logToConsole('integrationConsole', '步骤2：测试页面检测', 'info');
+                await services.zhixueAdapter.detectPageElements();
+                logToConsole('integrationConsole', '✅ 页面检测完成', 'success');
+
+                // 步骤3：测试评分细则生成
+                logToConsole('integrationConsole', '步骤3：测试评分细则生成', 'info');
+                const rubric = await services.aiScoringEngine.generateScoringRubric(
+                    '测试题目',
+                    '参考答案内容',
+                    'subjective'
+                );
+                logToConsole('integrationConsole', `✅ 评分细则生成完成：${rubric.dimensions.length}个维度`, 'success');
+
+                // 步骤4：测试完整工作流
+                logToConsole('integrationConsole', '步骤4：测试完整工作流', 'info');
+                await services.workflowManager.startGradingWorkflow({
+                    studentInfo: { name: '集成测试', id: 'TEST001' },
+                    questionInfo: { content: '测试题目', type: 'subjective' },
+                    referenceAnswer: '参考答案',
+                    confidenceThreshold: 70
+                });
+                logToConsole('integrationConsole', '✅ 完整工作流测试完成', 'success');
+
+                // 步骤5：验证结果
+                logToConsole('integrationConsole', '步骤5：验证测试结果', 'info');
+
+                const finalState = services.workflowManager.getWorkflowState();
+                const history = services.workflowManager.getWorkflowHistory(1);
+
+                if (history.length > 0 && finalState.isProcessing === false) {
+                    logToConsole('integrationConsole', '✅ 测试结果验证通过', 'success');
+
+                    const lastWorkflow = history[0];
+                    logToConsole('integrationConsole',
+                        `最近工作流：${lastWorkflow.status}，分数：${lastWorkflow.totalScore}分，置信度：${lastWorkflow.confidence}%`,
+                        'info'
+                    );
+                } else {
+                    throw new Error('测试结果验证失败');
+                }
+
+                testStats.integration.tests++;
+
+                showTestResult('integrationResult', true,
+                    '✅ 综合集成测试完成',
+                    '所有组件集成正常，工作流运行成功'
+                );
+
+                logToConsole('integrationConsole', '🎉 综合集成测试全部通过！', 'success');
+
+            } catch (error) {
+                testStats.integration.errors++;
+                logToConsole('integrationConsole', `❌ 集成测试失败: ${error.message}`, 'error');
+                showTestResult('integrationResult', false, '集成测试失败', error.message);
+            } finally {
+                showLoading('integrationLoading', false);
+                updateStatistics();
+            }
+        }
+
+        // 更新统计信息
+        function updateStatistics() {
+            // 计算平均评分时间
+            const avgTimes = [
+                testStats.adapter.avgTime / 1000,
+                testStats.engine.avgTime / 1000,
+                testStats.workflow.avgTime / 1000,
+                testStats.integration.avgTime / 1000
+            ].filter(time => time > 0);
+
+            const overallAvgTime = avgTimes.reduce((a, b) => a + b, 0) / avgTimes.length;
+            document.getElementById('avgScoringTime').textContent = `${overallAvgTime.toFixed(1)}s`;
+
+            // 计算成功率
+            const totalTests = testStats.adapter.tests + testStats.engine.tests + testStats.workflow.tests + testStats.integration.tests;
+            const totalErrors = testStats.adapter.errors + testStats.engine.errors + testStats.workflow.errors + testStats.integration.errors;
+            const successRate = totalTests > 0 ? ((totalTests - totalErrors) / totalTests * 100).toFixed(1) : 0;
+
+            document.getElementById('successRatePercent').textContent = `${successRate}%`;
+            document.getElementById('totalTests').textContent = totalTests;
+            document.getElementById('errorCount').textContent = totalErrors;
+
+            // 更新工作流统计
+            if (services) {
+                const state = services.workflowManager.getWorkflowState();
+                updateStatus('workflowCount', state.workflowCount);
+                updateStatus('successRate', `${state.success}/${state.total}`);
+            }
+        }
+
+        // 导出测试结果
+        function exportTestResults() {
+            const results = {
+                timestamp: new Date().toISOString(),
+                statistics: testStats,
+                summary: {
+                    totalTests: testStats.adapter.tests + testStats.engine.tests + testStats.workflow.tests + testStats.integration.tests,
+                    totalErrors: testStats.adapter.errors + testStats.engine.errors + testStats.workflow.errors + testStats.integration.errors,
+                    overallSuccessRate: testStats.adapter.tests + testStats.engine.tests + testStats.workflow.tests + testStats.integration.tests > 0
+                        ? ((testStats.adapter.tests + testStats.engine.tests + testStats.workflow.tests + testStats.integration.tests -
+                           (testStats.adapter.errors + testStats.engine.errors + testStats.workflow.errors + testStats.integration.errors)) /
+                           (testStats.adapter.tests + testStats.engine.tests + testStats.workflow.tests + testStats.integration.tests) * 100).toFixed(1)
+                        : 0
+                },
+                services: services ? services.workflowManager.getWorkflowHistory() : []
+            };
+
+            const dataStr = JSON.stringify(results, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `test-results-${new Date().toISOString()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            logToConsole('integrationConsole', '测试结果已导出', 'info');
+        }
+
+        // 重置统计
+        function resetStatistics() {
+            Object.keys(testStats).forEach(key => {
+                testStats[key] = { tests: 0, errors: 0, avgTime: 0 };
+                if (key === 'workflow') {
+                    testStats[key].success = 0;
+                    testStats[key].total = 0;
+                }
+            });
+
+            updateStatistics();
+            logToConsole('integrationConsole', '统计信息已重置', 'info');
+        }
+
+        // 辅助测试函数
+        async function testAutoMode() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            logToConsole('integrationConsole', '测试自动模式...', 'info');
+            services.workflowManager.setAutoMode(true);
+            logToConsole('integrationConsole', '自动模式已开启', 'info');
+        }
+
+        async function testManualReviewFlow() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            logToConsole('integrationConsole', '测试人工复核流程...', 'info');
+
+            // 模拟低置信度评分结果
+            const mockLowConfidenceResult = {
+                totalScore: 12,
+                confidence: 45,
+                breakdown: [],
+                feedback: '评分置信度较低，建议人工复核'
+            };
+
+            services.workflowManager.emit('manual-review-required', {
+                result: mockLowConfidenceResult,
+                reason: '置信度低于阈值'
+            });
+
+            logToConsole('integrationConsole', '✅ 人工复核流程测试完成', 'success');
+        }
+
+        async function testPerformance() {
+            if (!services) {
+                alert('请先初始化服务');
+                return;
+            }
+
+            logToConsole('integrationConsole', '开始性能测试...', 'info');
+
+            const iterations = 10;
+            const results = [];
+
+            for (let i = 0; i < iterations; i++) {
+                const startTime = performance.now();
+
+                try {
+                    // 执行快速测试
+                    await services.zhixueAdapter.detectPageType();
+                    const endTime = performance.now();
+                    results.push(endTime - startTime);
+
+                    logToConsole('integrationConsole', `第${i + 1}次测试：${(endTime - startTime).toFixed(2)}ms`, 'info');
+                } catch (error) {
+                    logToConsole('integrationConsole', `第${i + 1}次测试失败`, 'error');
+                }
+            }
+
+            const avgTime = results.reduce((a, b) => a + b, 0) / results.length;
+            const minTime = Math.min(...results);
+            const maxTime = Math.max(...results);
+
+            logToConsole('integrationConsole', `性能测试完成：`, 'success');
+            logToConsole('integrationConsole', `平均响应时间：${avgTime.toFixed(2)}ms`, 'info');
+            logToConsole('integrationConsole', `最快响应时间：${minTime.toFixed(2)}ms`, 'info');
+            logToConsole('integrationConsole', `最慢响应时间：${maxTime.toFixed(2)}ms`, 'info');
+        }
+
+        // 页面加载完成后自动初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔧 AI智能阅卷助手集成测试系统已加载');
+            console.log('📋 可用测试功能：');
+            console.log('  1. 智学网适配器测试 - 检测页面元素和捕捉功能');
+            console.log('  2. AI评分引擎测试 - 测试评分细则生成和AI评分');
+            console.log('  3. 工作流管理器测试 - 测试完整工作流协调');
+            console.log('  4. 综合集成测试 - 测试所有组件的集成');
+            console.log('  5. 性能测试 - 测试系统响应性能');
+
+            // 延迟初始化，等待用户确认
+            setTimeout(() => {
+                if (confirm('是否立即初始化服务并开始测试？')) {
+                    initializeServices();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

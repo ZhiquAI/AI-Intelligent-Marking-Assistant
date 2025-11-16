@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI阅卷助手 - 设置</title>
+
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 引入Lucide图标库 -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- 引入Inter字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            width: 900px;
+            min-height: 700px;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 页面头部 -->
+    <div class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="settings" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">AI阅卷助手设置</h1>
+                    <p class="text-sm text-gray-500">配置API密钥、模型参数和阅卷策略</p>
+                </div>
+            </div>
+            <button id="closeBtn" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 设置导航标签 -->
+    <div class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="flex space-x-2 bg-gray-100 p-1.5 rounded-xl border border-gray-200">
+            <button data-settings-tab="api" class="settings-tab-btn flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all bg-white text-blue-600 shadow-sm border border-blue-200 flex items-center justify-center space-x-2">
+                <i data-lucide="key" class="w-4 h-4"></i>
+                <span>API密钥</span>
+            </button>
+            <button data-settings-tab="model" class="settings-tab-btn flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all text-gray-700 hover:bg-white hover:border-gray-200 border border-transparent flex items-center justify-center space-x-2">
+                <i data-lucide="brain" class="w-4 h-4"></i>
+                <span>模型设置</span>
+            </button>
+            <button data-settings-tab="strategy" class="settings-tab-btn flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all text-gray-700 hover:bg-white hover:border-gray-200 border border-transparent flex items-center justify-center space-x-2">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <span>阅卷策略</span>
+            </button>
+            <button data-settings-tab="advanced" class="settings-tab-btn flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all text-gray-700 hover:bg-white hover:border-gray-200 border border-transparent flex items-center justify-center space-x-2">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                <span>高级设置</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 设置内容 -->
+    <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
+        <!-- API 密钥管理 -->
+        <section id="settings-api" class="settings-tab-content space-y-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start space-x-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                    <div>
+                        <h4 class="text-base font-medium text-blue-900">安全提示</h4>
+                        <p class="text-sm text-blue-700 mt-1">您的API密钥将安全存储在本地浏览器中，不会被上传到任何服务器。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- OpenAI Section -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-base font-semibold text-gray-900 flex items-center space-x-2">
+                            <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="zap" class="w-5 h-5 text-green-600"></i>
+                            </span>
+                            <span>OpenAI (GPT-4o)</span>
+                        </h4>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">推荐</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">端点 (Endpoint)</label>
+                            <input type="text" id="openaiEndpoint" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">模型 (Model)</label>
+                            <select id="openaiModel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="gpt-4o" selected>gpt-4o</option>
+                                <option value="gpt-4o-mini">gpt-4o-mini</option>
+                                <option value="gpt-4-turbo">gpt-4-turbo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="password" id="openaiKey" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="sk-...">
+                                <button id="testOpenAI" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="测试连接">
+                                    <i data-lucide="plug-zap" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <span id="openaiStatus" class="text-xs text-gray-500 mt-1 block">未配置</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gemini Section -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                    <h4 class="text-base font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                        <span class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="gem" class="w-5 h-5 text-purple-600"></i>
+                        </span>
+                        <span>Google (Gemini)</span>
+                    </h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">端点 (Endpoint)</label>
+                            <input type="text" id="geminiEndpoint" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="https://generativelanguage.googleapis.com/v1beta" value="https://generativelanguage.googleapis.com/v1beta">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">模型 (Model)</label>
+                            <select id="geminiModel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="gemini-2.5-pro" selected>gemini-2.5-pro</option>
+                                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="password" id="geminiKey" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="请输入您的Gemini API Key...">
+                                <button id="testGemini" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="测试连接">
+                                    <i data-lucide="plug-zap" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <span id="geminiStatus" class="text-xs text-gray-500 mt-1 block">未配置</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GLM Section -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                    <h4 class="text-base font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                        <span class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="box" class="w-5 h-5 text-orange-600"></i>
+                        </span>
+                        <span>智谱AI (GLM-4.5V)</span>
+                    </h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">端点 (Endpoint)</label>
+                            <input type="text" id="glmEndpoint" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="https://open.bigmodel.cn/api/paas/v4" value="https://open.bigmodel.cn/api/paas/v4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">模型 (Model)</label>
+                            <select id="glmModel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="glm-4.5-vision" selected>glm-4.5-vision</option>
+                                <option value="glm-4v">glm-4v</option>
+                                <option value="glm-4-plus">glm-4-plus</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="password" id="glmKey" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="请输入您的智谱AI API Key...">
+                                <button id="testGLM" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="测试连接">
+                                    <i data-lucide="plug-zap" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <span id="glmStatus" class="text-xs text-gray-500 mt-1 block">未配置</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 保存按钮 -->
+            <div class="mt-4">
+                <button
+                    id="saveSettings"
+                    class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center space-x-2"
+                >
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <span>保存设置</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 模型设置 -->
+        <section id="settings-model" class="settings-tab-content space-y-4 hidden">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start space-x-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                    <div>
+                        <h4 class="text-base font-medium text-blue-900">模型参数说明</h4>
+                        <p class="text-sm text-blue-700 mt-1">根据您的阅卷需求调整模型参数，优化评分效果和成本控制</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GPT-4o 参数设置 -->
+            <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="brain" class="w-6 h-6 text-blue-600"></i>
+                    </span>
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-900">GPT-4o</h4>
+                        <p class="text-sm text-gray-600">OpenAI 最先进的全模态AI模型</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <!-- 温度参数 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            温度 (Temperature): <span class="text-blue-600 font-semibold" id="gpt4o-temp-value">0.7</span>
+                        </label>
+                        <input type="range" id="gpt4o-temp" min="0" max="1" step="0.1" value="0.7" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>精确</span>
+                            <span>平衡</span>
+                            <span>创新</span>
+                        </div>
+                    </div>
+
+                    <!-- 最大Tokens -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">最大Tokens</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="range" id="gpt4o-max-tokens" min="512" max="4096" step="256" value="2048" class="flex-1">
+                            <span class="text-sm font-medium text-blue-600 min-w-[60px]" id="gpt4o-max-tokens-value">2048</span>
+                        </div>
+                    </div>
+
+                    <!-- Top-P -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Top-P: <span class="text-blue-600 font-semibold" id="gpt4o-topp-value">0.9</span>
+                        </label>
+                        <input type="range" id="gpt4o-topp" min="0.1" max="1" step="0.1" value="0.9" class="w-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gemini 参数设置 -->
+            <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-purple-600"></i>
+                    </span>
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-900">Gemini</h4>
+                        <p class="text-sm text-gray-600">Google 多模态AI模型</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <!-- 温度参数 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            温度 (Temperature): <span class="text-purple-600 font-semibold" id="gemini-temp-value">0.6</span>
+                        </label>
+                        <input type="range" id="gemini-temp" min="0" max="1" step="0.1" value="0.6" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>精确</span>
+                            <span>平衡</span>
+                            <span>创新</span>
+                        </div>
+                    </div>
+
+                    <!-- 最大Tokens -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">最大Tokens</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="range" id="gemini-max-tokens" min="512" max="4096" step="256" value="2048" class="flex-1">
+                            <span class="text-sm font-medium text-purple-600 min-w-[60px]" id="gemini-max-tokens-value">2048</span>
+                        </div>
+                    </div>
+
+                    <!-- Top-K -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Top-K: <span class="text-purple-600 font-semibold" id="gemini-topk-value">40</span>
+                        </label>
+                        <input type="range" id="gemini-topk" min="1" max="100" step="1" value="40" class="w-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- GLM 参数设置 -->
+            <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="box" class="w-6 h-6 text-orange-600"></i>
+                    </span>
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-900">GLM-4.5V</h4>
+                        <p class="text-sm text-gray-600">智谱AI 多模态大模型</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <!-- 温度参数 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            温度 (Temperature): <span class="text-orange-600 font-semibold" id="glm-temp-value">0.65</span>
+                        </label>
+                        <input type="range" id="glm-temp" min="0" max="1" step="0.05" value="0.65" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>精确</span>
+                            <span>平衡</span>
+                            <span>创新</span>
+                        </div>
+                    </div>
+
+                    <!-- 最大Tokens -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">最大Tokens</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="range" id="glm-max-tokens" min="512" max="4096" step="256" value="2048" class="flex-1">
+                            <span class="text-sm font-medium text-orange-600 min-w-[60px]" id="glm-max-tokens-value">2048</span>
+                        </div>
+                    </div>
+
+                    <!-- 重复惩罚 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            重复惩罚: <span class="text-orange-600 font-semibold" id="glm-penalty-value">1.1</span>
+                        </label>
+                        <input type="range" id="glm-penalty" min="1" max="1.5" step="0.05" value="1.1" class="w-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 预设配置 -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="text-sm font-medium text-blue-900 mb-3 flex items-center">
+                    <i data-lucide="preset" class="w-4 h-4 mr-2"></i>
+                    快速预设配置
+                </h4>
+                <div class="grid grid-cols-3 gap-3">
+                    <button class="preset-config-btn p-3 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors flex items-center justify-center space-x-2" data-preset="speed">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        <span>速度优先</span>
+                    </button>
+                    <button class="preset-config-btn p-3 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors flex items-center justify-center space-x-2" data-preset="balance">
+                        <i data-lucide="scale" class="w-4 h-4"></i>
+                        <span>均衡模式</span>
+                    </button>
+                    <button class="preset-config-btn p-3 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors flex items-center justify-center space-x-2" data-preset="accuracy">
+                        <i data-lucide="target" class="w-4 h-4"></i>
+                        <span>准确优先</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阅卷策略 -->
+        <section id="settings-strategy" class="settings-tab-content space-y-4 hidden">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start space-x-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                    <div>
+                        <h4 class="text-base font-medium text-blue-900">策略说明</h4>
+                        <p class="text-sm text-blue-700 mt-1">选择最适合您需求的阅卷策略</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3" id="strategy-list">
+                <!-- 策略一 -->
+                <label class="strategy-item flex items-start p-4 bg-white border-2 border-blue-500 rounded-xl hover:shadow-md transition-shadow cursor-pointer bg-blue-50">
+                    <input type="radio" name="grading-strategy" class="mt-1 text-blue-600" value="gpt4o-first" checked>
+                    <div class="ml-3">
+                        <span class="font-medium text-gray-900">GPT-4o 优先</span>
+                        <p class="text-sm text-gray-600 mt-1">速度与准确度最佳均衡，自动推荐。</p>
+                    </div>
+                </label>
+
+                <!-- 策略二 -->
+                <label class="strategy-item flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
+                    <input type="radio" name="grading-strategy" class="mt-1 text-blue-600" value="gemini-first">
+                    <div class="ml-3">
+                        <span class="font-medium text-gray-900">Gemini 优先</span>
+                        <p class="text-sm text-gray-600 mt-1">成本效益最高，适合简单题目。</p>
+                    </div>
+                </label>
+
+                <!-- 策略三 -->
+                <label class="strategy-item flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
+                    <input type="radio" name="grading-strategy" class="mt-1 text-blue-600" value="dual-model">
+                    <div class="ml-3">
+                        <span class="font-medium text-gray-900">双模型交叉验证</span>
+                        <p class="text-sm text-gray-600 mt-1">准确度最高，但速度较慢且成本较高。</p>
+                    </div>
+                </label>
+            </div>
+        </section>
+
+        <!-- 高级设置 -->
+        <section id="settings-advanced" class="settings-tab-content space-y-4 hidden">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start space-x-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                    <div>
+                        <h4 class="text-base font-medium text-blue-900">高级设置说明</h4>
+                        <p class="text-sm text-blue-700 mt-1">这些设置会影响系统的默认行为，请谨慎修改。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+                    <div>
+                        <label class="font-medium text-gray-800 text-sm">自动保存</label>
+                        <p class="text-xs text-gray-600 mt-1">每30秒自动保存评分记录</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="autoSaveToggle" class="sr-only peer" checked>
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+                    <div>
+                        <label class="font-medium text-gray-800 text-sm">调试模式</label>
+                        <p class="text-xs text-gray-600 mt-1">显示详细的调试信息</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="debugModeToggle" class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+                <div class="p-4 bg-white border border-gray-200 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">阅卷速度</label>
+                    <select id="gradingSpeedSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="slow">慢速 (质量优先)</option>
+                        <option value="normal" selected>正常</option>
+                        <option value="fast">快速 (速度优先)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 状态信息 -->
+    <div class="bg-white border-t border-gray-200 px-6 py-4">
+        <div class="space-y-2">
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span class="text-sm text-gray-600">当前模型</span>
+                <span id="currentModel" class="text-sm font-medium text-gray-900">未设置</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span class="text-sm text-gray-600">配置状态</span>
+                <span id="configStatus" class="text-sm font-medium text-yellow-600">请配置至少一个API密钥</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 消息提示 -->
+    <div id="toast" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex items-center space-x-3 fade-in">
+            <i id="toastIcon" class="w-5 h-5 text-green-500"></i>
+            <span id="toastMessage" class="text-sm font-medium text-gray-900"></span>
+        </div>
+    </div>
+
+    <!-- 引入设置页面脚本 -->
+    <script src="settings.js" type="module"></script>
+
+    <!-- 初始化Lucide图标 -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

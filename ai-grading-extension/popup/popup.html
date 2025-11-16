@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智学网AI智能阅卷助手</title>
+
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 引入Lucide图标库 -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- 引入jsPDF库用于PDF生成 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- 引入PDF.js用于PDF解析 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- 引入Tesseract.js用于OCR图片文字识别 -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+
+    <!-- 引入Inter字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- 引入主样式文件 -->
+    <link rel="stylesheet" href="../ui/styles/main.css">
+
+    <style>
+        /* Chrome 扩展 Popup 特定样式 */
+        body {
+            width: 400px;
+            min-height: 500px;
+            max-height: 600px;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        html {
+            width: 400px;
+            min-height: 500px;
+            max-height: 600px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .popup-container {
+            width: 100%;
+            min-height: 500px;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .popup-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .popup-body {
+            padding: 12px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 520px;
+        }
+
+        .popup-footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 16px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="popup-container">
+        <!-- 头部 -->
+        <header class="popup-header">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="brain-circuit" class="w-5 h-5 text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-gray-900">AI阅卷助手</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="rubric-config-button" class="p-2 hover:bg-gray-100 rounded-lg" title="评分标准配置">
+                        <i data-lucide="clipboard-list" class="w-4 h-4 text-gray-600"></i>
+                    </button>
+                    <button id="settings-button" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i data-lucide="settings" class="w-4 h-4 text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 状态栏 (简化版) -->
+        <div class="bg-white border-b border-gray-200 px-4 py-2">
+            <div class="flex items-center justify-between">
+                <!-- 图片定位状态 -->
+                <div class="flex items-center space-x-1">
+                    <div class="w-2 h-2 bg-green-500 rounded-full" title="状态正常"></div>
+                    <i data-lucide="target" class="w-3 h-3 text-gray-600"></i>
+                </div>
+
+                <!-- 分隔线 -->
+                <div class="w-px h-3 bg-gray-300"></div>
+
+                <!-- AI链接状态 -->
+                <div class="flex items-center space-x-1">
+                    <div class="w-2 h-2 bg-green-500 rounded-full" title="状态正常"></div>
+                    <i data-lucide="link" class="w-3 h-3 text-gray-600"></i>
+                </div>
+
+                <!-- 分隔线 -->
+                <div class="w-px h-3 bg-gray-300"></div>
+
+                <!-- 评分设置状态 -->
+                <div id="status-rubric-config" class="flex items-center space-x-1 cursor-pointer hover:bg-gray-50 transition-colors py-1 px-2 rounded">
+                    <div class="w-2 h-2 bg-green-500 rounded-full" title="状态正常"></div>
+                    <i data-lucide="clipboard-list" class="w-3 h-3 text-gray-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 切换按钮 -->
+        <div class="bg-gray-50 px-4 py-2">
+            <div class="flex bg-white p-1 rounded-lg space-x-1">
+                <button data-tab="grading" class="tab-button active flex-1 text-center py-2 px-2 rounded-md text-xs font-medium transition-all flex items-center justify-center space-x-1 bg-blue-600 text-white shadow-sm">
+                    <i data-lucide="sparkles" class="w-3 h-3"></i>
+                    <span>阅卷</span>
+                </button>
+                <button data-tab="review" class="tab-button flex-1 text-center py-2 px-2 rounded-md text-xs font-medium transition-all flex items-center justify-center space-x-1 text-gray-700 hover:bg-gray-50 border border-transparent">
+                    <i data-lucide="user-check" class="w-3 h-3"></i>
+                    <span>复核</span>
+                </button>
+                <button data-tab="analysis" class="tab-button flex-1 text-center py-2 px-2 rounded-md text-xs font-medium transition-all flex items-center justify-center space-x-1 text-gray-700 hover:bg-gray-50 border border-transparent">
+                    <i data-lucide="bar-chart-3" class="w-3 h-3"></i>
+                    <span>分析</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 内容区域 -->
+        <main class="popup-body">
+            <!-- 智能阅卷模块 (默认显示) -->
+            <div id="tab-content-grading" class="tab-content scale-in space-y-3">
+                <!-- 实时统计 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="target" class="w-4 h-4 text-gray-800"></i>
+                        <h3 class="text-sm font-semibold text-gray-800">实时统计</h3>
+                    </div>
+                    <!-- 水平紧凑布局 - 节省40%空间 -->
+                    <div class="flex items-center justify-between mt-3 px-2">
+                        <div class="flex flex-col items-center">
+                            <div class="text-base font-bold text-gray-800">156</div>
+                            <div class="text-[10px] text-gray-500 whitespace-nowrap">今日已阅</div>
+                        </div>
+                        <div class="h-8 w-px bg-gray-200"></div>
+                        <div class="flex flex-col items-center">
+                            <div class="text-base font-bold text-gray-800">32秒</div>
+                            <div class="text-[10px] text-gray-500 whitespace-nowrap">平均用时</div>
+                        </div>
+                        <div class="h-8 w-px bg-gray-200"></div>
+                        <div class="flex flex-col items-center">
+                            <div class="text-base font-bold text-green-600">98%</div>
+                            <div class="text-[10px] text-gray-500 whitespace-nowrap">准确率</div>
+                        </div>
+                        <div class="h-8 w-px bg-gray-200"></div>
+                        <div class="flex flex-col items-center">
+                            <div class="text-base font-bold text-blue-600">92%</div>
+                            <div class="text-[10px] text-gray-500 whitespace-nowrap">置信度</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 阅卷操作 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="radio-button" class="w-4 h-4 text-gray-800"></i>
+                        <h3 class="text-sm font-semibold text-gray-800">阅卷操作</h3>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="aiTrialBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-1">
+                            <i data-lucide="search" class="w-3 h-3"></i>
+                            <span class="text-xs">AI试阅</span>
+                        </button>
+                        <button id="aiAutoBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-1">
+                            <i data-lucide="zap" class="w-3 h-3"></i>
+                            <span class="text-xs">AI自动</span>
+                        </button>
+                        <button id="pauseBtn" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-1">
+                            <i data-lucide="pause" class="w-3 h-3"></i>
+                            <span class="text-xs">暂停</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 评分结果 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-gray-800"></i>
+                        <h3 class="text-sm font-semibold text-gray-800">评分结果</h3>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <div class="text-center py-2">
+                            <div class="text-2xl font-bold text-blue-800" id="total-score">85<span class="text-lg text-blue-600">/100</span></div>
+                            <div class="text-xs text-blue-600 mt-1">总分</div>
+                        </div>
+
+                        <!-- 分项得分 -->
+                        <div class="space-y-1 mt-2" id="dimension-scores">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-blue-700">观点明确:</span>
+                                <span class="font-medium">28/30</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-green-700">史实准确:</span>
+                                <span class="font-medium">25/30</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-purple-700">论述充分:</span>
+                                <span class="font-medium">22/25</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-orange-700">语言表达:</span>
+                                <span class="font-medium">10/15</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 评分理由 -->
+                    <div class="mt-2 p-2 bg-gray-50 rounded-lg">
+                        <h4 class="text-xs font-medium text-gray-700 mb-1">💡 评分理由</h4>
+                        <div id="scoring-reasons" class="text-xs text-gray-600 space-y-1">
+                            <div class="flex items-start space-x-2">
+                                <span class="font-medium text-blue-600 min-w-[60px]">观点明确:</span>
+                                <span>论点清晰，立场明确</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="font-medium text-green-600 min-w-[60px]">史实准确:</span>
+                                <span>历史事实准确无误</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 评分记录查看 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="clipboard-list" class="w-4 h-4 text-gray-800"></i>
+                            <h3 class="text-sm font-semibold text-gray-800">评分记录</h3>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="refreshRecordsBtn" class="text-xs text-blue-600 hover:text-blue-700 flex items-center">
+                                <i data-lucide="refresh-ccw" class="w-3 h-3 mr-1"></i>
+                                刷新
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 记录列表 -->
+                    <div class="max-h-40 overflow-y-auto custom-scrollbar">
+                        <div class="space-y-2" id="reviewRecordsList">
+                            <div class="text-center py-4 text-gray-500 text-xs">
+                                正在加载评分记录...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 人工复核模块 (默认隐藏) -->
+            <div id="tab-content-review" class="tab-content hidden space-y-3">
+                <!-- 复核试卷进度 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4 text-gray-800"></i>
+                            <h3 class="text-sm font-semibold text-gray-800">复核进度</h3>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-blue-600" id="reviewProgressText">0/15</div>
+                        </div>
+                    </div>
+
+                    <!-- 主要进度条 -->
+                    <div class="mb-3">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-600">总体进度</span>
+                            <span class="text-blue-600 font-medium" id="reviewProgressPercentage">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-1" style="width: 0%" id="reviewProgressBar">
+                                <i data-lucide="check" class="w-2 h-2 text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 复核状态信息 -->
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div class="bg-green-50 rounded-lg p-2 text-center">
+                            <div class="text-xs text-green-600 mb-1">当前得分</div>
+                            <div class="text-sm font-bold text-green-700" id="current-score">0分</div>
+                        </div>
+                        <div class="bg-blue-50 rounded-lg p-2 text-center">
+                            <div class="text-xs text-blue-600 mb-1">AI建议</div>
+                            <div class="text-sm font-bold text-blue-700" id="ai-suggestion">0分</div>
+                        </div>
+                    </div>
+
+                    <!-- 打分区域 -->
+                    <div class="mb-3 p-2 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-center space-x-2">
+                            <label class="text-xs font-medium text-gray-700">得分：</label>
+                            <input type="number" id="score-input" class="w-16 text-sm font-bold text-center border-none focus:ring-0 focus:outline-none" value="0" min="0" max="100">
+                            <span class="text-xs text-gray-500">/ 100</span>
+                        </div>
+                    </div>
+
+                    <!-- 复核操作按钮 -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="skip-review" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-3 rounded-lg font-medium transition-all flex items-center justify-center space-x-1">
+                            <i data-lucide="skip-forward" class="w-3 h-3"></i>
+                            <span class="text-xs">跳过</span>
+                        </button>
+                        <button id="save-review" class="bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg font-medium transition-all flex items-center justify-center space-x-1">
+                            <i data-lucide="save" class="w-3 h-3"></i>
+                            <span class="text-xs">保存</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据分析 (默认隐藏) -->
+            <div id="tab-content-analysis" class="tab-content hidden space-y-3">
+                <!-- 评阅数据分析 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="clipboard-list" class="w-4 h-4 text-gray-800"></i>
+                        <h3 class="text-sm font-semibold text-gray-800">评阅数据</h3>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="text-center py-2 border border-gray-200 rounded">
+                            <i data-lucide="file-text" class="w-4 h-4 text-blue-600 mx-auto mb-1"></i>
+                            <div class="text-lg font-bold text-gray-800" id="totalPapers">892</div>
+                            <div class="text-xs text-gray-500">评阅份数</div>
+                        </div>
+                        <div class="text-center py-2 border border-gray-200 rounded">
+                            <i data-lucide="trending-up" class="w-4 h-4 text-green-600 mx-auto mb-1"></i>
+                            <div class="text-lg font-bold text-gray-800" id="averageScore">85.6</div>
+                            <div class="text-xs text-gray-500">平均分</div>
+                        </div>
+                        <div class="text-center py-2 border border-gray-200 rounded">
+                            <i data-lucide="percent" class="w-4 h-4 text-purple-600 mx-auto mb-1"></i>
+                            <div class="text-lg font-bold text-gray-800" id="scoreRate">85.6%</div>
+                            <div class="text-xs text-gray-500">得分率</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分数分布图表 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="trending-up" class="w-4 h-4 text-gray-800"></i>
+                            <h3 class="text-sm font-semibold text-gray-800">分布图表</h3>
+                        </div>
+                        <select id="chartTypeSelect" class="text-xs border border-gray-300 rounded px-2 py-1">
+                            <option value="bar">柱状图</option>
+                            <option value="line">折线图</option>
+                            <option value="pie">饼图</option>
+                        </select>
+                    </div>
+                    <div class="h-32">
+                        <canvas id="scoreDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 详细统计 -->
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-gray-800"></i>
+                        <h3 class="text-sm font-semibold text-gray-800">详细统计</h3>
+                    </div>
+                    <div class="space-y-1" id="detailedStats">
+                        <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                            <span class="text-xs text-gray-700">最高分</span>
+                            <span class="font-medium text-gray-900 text-xs" id="maxScore">98分</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                            <span class="text-xs text-gray-700">最低分</span>
+                            <span class="font-medium text-gray-900 text-xs" id="minScore">62分</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                            <span class="text-xs text-gray-700">中位数</span>
+                            <span class="font-medium text-gray-900 text-xs" id="medianScore">87分</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1">
+                            <span class="text-xs text-gray-700">标准差</span>
+                            <span class="font-medium text-gray-900 text-xs" id="stdDev">8.3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="popup-footer">
+            <div class="text-center">
+                <span class="text-xs text-gray-500">智学网AI智能阅卷助手 v5.0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 模态框容器 (隐藏状态) -->
+    <div id="modal-container" class="hidden">
+        <!-- 分数调整模态框 -->
+        <div id="scoreAdjustmentModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-2xl p-4 w-full max-w-md transform transition-all scale-95 opacity-0" id="scoreModalContent">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">调整分项得分</h3>
+                        <button id="closeScoreModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div id="scoreAdjustmentList" class="space-y-3 mb-4 max-h-60 overflow-y-auto custom-scrollbar">
+                        <!-- 分项得分调整项将通过JavaScript动态生成 -->
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">修改理由</label>
+                        <textarea id="scoreModifyReason" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-orange-500 focus:border-transparent" rows="2" placeholder="请说明修改分数的理由..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-700">总分:</span>
+                            <span class="text-xl font-bold text-orange-600" id="adjustedTotalScore">0</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button id="cancelScoreAdjustBtn" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors text-xs">取消</button>
+                        <button id="confirmScoreAdjustBtn" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-xs">确认修改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 确认对话框 -->
+        <div id="reviewConfirmDialog" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-2xl p-4 w-full max-w-sm transform transition-all scale-95 opacity-0" id="confirmDialogContent">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base font-bold text-gray-800 mb-2" id="confirmDialogTitle">确认操作</h3>
+                            <p class="text-xs text-gray-600 mb-3" id="confirmDialogMessage">您确定要执行此操作吗？</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button id="cancelConfirmBtn" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors text-xs">取消</button>
+                        <button id="okConfirmBtn" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-xs">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 评分标准配置模态框 -->
+        <div id="rubricConfigModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-2xl p-4 w-full max-w-2xl transform transition-all scale-95 opacity-0" id="rubricModalContent">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">评分标准配置</h3>
+                        <button id="closeRubricModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4 mb-6 max-h-96 overflow-y-auto custom-scrollbar">
+                        <!-- 评分维度管理 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">评分维度</h4>
+                            <div id="rubricDimensions" class="space-y-3">
+                                <!-- 动态生成的维度项 -->
+                            </div>
+                            <button id="addDimensionBtn" class="mt-3 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs transition-colors">
+                                <i data-lucide="plus" class="w-3 h-3 inline mr-1"></i>添加维度
+                            </button>
+                        </div>
+
+                        <!-- 评分标准模板 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">标准模板</h4>
+                            <div class="grid grid-cols-1 gap-3">
+                                <div class="flex items-center justify-between p-3 bg-white rounded-lg border cursor-pointer hover:border-blue-500 transition-colors template-item" data-template="essay">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">作文评分</h5>
+                                        <p class="text-xs text-gray-600">内容、结构、语言、书写</p>
+                                    </div>
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600 hidden selected-icon"></i>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-white rounded-lg border cursor-pointer hover:border-blue-500 transition-colors template-item" data-template="objective">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">客观题评分</h5>
+                                        <p class="text-xs text-gray-600">答案正确性</p>
+                                    </div>
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600 hidden selected-icon"></i>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-white rounded-lg border cursor-pointer hover:border-blue-500 transition-colors template-item" data-template="subjective">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">主观题评分</h5>
+                                        <p class="text-xs text-gray-600">知识点、逻辑、表达</p>
+                                    </div>
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600 hidden selected-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 总分设置 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">总分设置</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">总分</label>
+                                    <input type="number" id="totalScoreInput" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="100" min="1" max="1000">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">及格分</label>
+                                    <input type="number" id="passScoreInput" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="60" min="1" max="1000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 评分可视化 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">评分分布预览</h4>
+                            <canvas id="rubricChart" class="w-full h-32"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-2">
+                        <button id="cancelRubricConfigBtn" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors text-xs">取消</button>
+                        <button id="saveRubricConfigBtn" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-xs">保存配置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设置模态框 -->
+        <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-2xl p-4 w-full max-w-2xl transform transition-all scale-95 opacity-0" id="settingsModalContent">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">系统设置</h3>
+                        <button id="closeSettingsModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-6 mb-6 max-h-96 overflow-y-auto custom-scrollbar">
+                        <!-- API配置 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">API配置</h4>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">API类型</label>
+                                        <select id="apiTypeSelect" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="openai">OpenAI GPT-4o</option>
+                                            <option value="gemini">Google Gemini</option>
+                                            <option value="claude">Anthropic Claude</option>
+                                            <option value="custom">自定义API</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">API密钥</label>
+                                        <div class="flex space-x-2">
+                                            <input type="password" id="apiKeyInput" class="flex-1 p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="输入API密钥">
+                                            <button id="testApiBtn" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-xs transition-colors">测试</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">API端点</label>
+                                    <input type="url" id="apiEndpointInput" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://api.openai.com/v1/chat/completions">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 模型参数 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">模型参数</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">温度 (0-2)</label>
+                                    <input type="range" id="temperatureRange" class="w-full" min="0" max="2" step="0.1" value="0.7">
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>0</span>
+                                        <span id="temperatureValue">0.7</span>
+                                        <span>2</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">最大Token</label>
+                                    <input type="number" id="maxTokensInput" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="2048" min="100" max="8192">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Top-P (0-1)</label>
+                                    <input type="range" id="topPRange" class="w-full" min="0" max="1" step="0.1" value="1">
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>0</span>
+                                        <span id="topPValue">1</span>
+                                        <span>1</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 评分策略 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">评分策略</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="font-medium text-gray-800 text-xs">严格模式</label>
+                                        <p class="text-xs text-gray-600">扣分更严格，适合正式考试</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="strictModeToggle" class="sr-only peer" checked>
+                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="font-medium text-gray-800 text-xs">双模型验证</label>
+                                        <p class="text-xs text-gray-600">使用两个模型评分取平均值</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="dualModelToggle" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">评分模式</label>
+                                    <select id="gradingModeSelect" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="auto">自动评分</option>
+                                        <option value="assist">辅助评分</option>
+                                        <option value="manual">手动评分</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 高级设置 -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-3">高级设置</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="font-medium text-gray-800 text-xs">自动保存</label>
+                                        <p class="text-xs text-gray-600">每30秒自动保存评分记录</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="autoSaveToggle" class="sr-only peer" checked>
+                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="font-medium text-gray-800 text-xs">调试模式</label>
+                                        <p class="text-xs text-gray-600">显示详细的调试信息</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="debugModeToggle" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">阅卷速度</label>
+                                    <select id="gradingSpeedSelect" class="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="slow">慢速 (质量优先)</option>
+                                        <option value="normal" selected>正常</option>
+                                        <option value="fast">快速 (速度优先)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-2">
+                        <button id="cancelSettingsBtn" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors text-xs">取消</button>
+                        <button id="saveSettingsBtn" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-xs">保存设置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入SheetJS库，用于Excel文件解析 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- 引入jsPDF库，用于PDF导出 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- 引入Lucide图标库 -->
+    <script>
+        // 初始化Lucide图标
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
+
+    <!-- 引入Popup主脚本 -->
+    <script src="popup.js"></script>
+</body>
+</html>

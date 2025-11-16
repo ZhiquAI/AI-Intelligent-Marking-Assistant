@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chrome Extension Icon Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        button { padding: 10px 20px; margin: 5px; }
+        .download-link { display: inline-block; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Chrome扩展图标生成器</h1>
+    <p>点击下面的按钮生成并下载不同尺寸的图标：</p>
+
+    <div id="icons-container"></div>
+
+    <script>
+        function createIcon(size, color1, color2, text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // 绘制圆形背景
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 绘制文字
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${size * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, size/2, size/2);
+
+            return canvas;
+        }
+
+        function downloadIcon(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // 生成图标
+        const sizes = [
+            { size: 16, filename: 'icon16.png' },
+            { size: 32, filename: 'icon32.png' },
+            { size: 48, filename: 'icon48.png' },
+            { size: 128, filename: 'icon128.png' }
+        ];
+
+        const container = document.getElementById('icons-container');
+
+        sizes.forEach(({ size, filename }) => {
+            const canvas = createIcon(size, '#667eea', '#764ba2', 'AI');
+            canvas.id = `canvas-${size}`;
+            container.appendChild(canvas);
+
+            const button = document.createElement('button');
+            button.textContent = `下载 ${filename}`;
+            button.onclick = () => downloadIcon(canvas, filename);
+            container.appendChild(button);
+
+            const br = document.createElement('br');
+            container.appendChild(br);
+        });
+
+        console.log('图标已生成，请点击按钮下载');
+    </script>
+</body>
+</html>
